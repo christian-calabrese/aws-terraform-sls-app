@@ -150,7 +150,7 @@ resource "aws_api_gateway_method" "create_note" {
 
 resource "aws_api_gateway_integration" "create_note" {
   rest_api_id             = aws_api_gateway_rest_api.notes_api.id
-  resource_id             = aws_api_gateway_resource.note_resource.id
+  resource_id             = aws_api_gateway_resource.notes_resource.id
   http_method             = aws_api_gateway_method.create_note.http_method
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
