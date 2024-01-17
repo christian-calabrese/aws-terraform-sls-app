@@ -58,13 +58,11 @@ variable "vpc_enable_dns_hostnames" {
 variable "vpc_enable_nat_gateway" {
   description = "Should be true if you want to provision NAT Gateways for each of your private networks"
   type        = bool
-  default     = true
 }
 
 variable "vpc_single_nat_gateway" {
   description = "Should be true if you want to provision a single shared NAT Gateway across all of your private networks"
   type        = bool
-  default     = true
 }
 
 ################################################################################
@@ -73,5 +71,5 @@ variable "vpc_single_nat_gateway" {
 variable "acm_domain_name" {
   description = "The domain of the certificate to look up. If no certificate is found with this name, an error will be returned"
   type        = string
-  default     = "christiancalabrese.it"
+  default     = null
 }

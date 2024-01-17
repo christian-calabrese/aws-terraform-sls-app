@@ -16,13 +16,18 @@ module "sls-app-network-eu-south-1-prod" {
   vcs_repository_branch     = "main"
   oauth_token_id            = var.oauth_client_id
 
+  environment_sensitive_variables = {
+    AWS_ACCESS_KEY_ID     = var.aws_access_key_id
+    AWS_SECRET_ACCESS_KEY = var.aws_access_key_secret
+  }
+
   terraform_variables = merge(
     local.common_variables,
     {
-      vpc_cidr   = "172.31.0.0/16"
-      create_alb = "true"
-
-      environment = "prod"
+      vpc_cidr               = "172.31.0.0/16"
+      vpc_enable_nat_gateway = false
+      vpc_single_nat_gateway = false
+      environment            = "prod"
     }
   )
 
