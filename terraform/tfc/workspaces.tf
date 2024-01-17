@@ -69,7 +69,9 @@ module "sls-app-frontend-eu-south-1-prod" {
     AWS_SECRET_ACCESS_KEY = var.aws_access_key_secret
   }
 
-  terraform_variables = {}
+  terraform_variables = {
+    environment = "prod"
+  }
 
   tag_names = ["region:${var.aws_region}", "environment:prod", "project:${var.project}", "provider:aws", "component:frontend"]
 
