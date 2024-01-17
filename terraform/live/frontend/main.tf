@@ -22,9 +22,10 @@ module "s3_bucket" {
 }
 
 resource "aws_s3_bucket_object" "index" {
-  bucket = module.s3_bucket.s3_bucket_id
-  key    = "index.html"
-  source = "${path.module}/resources/webapp/index.html"
+  bucket       = module.s3_bucket.s3_bucket_id
+  key          = "index.html"
+  source       = "${path.module}/resources/webapp/index.html"
+  content_type = "text/html"
 
   # The filemd5() function is available in Terraform 0.11.12 and later
   # For Terraform 0.11.11 and earlier, use the md5() function and the file() function:
@@ -77,7 +78,7 @@ resource "aws_cloudfront_distribution" "this" {
   enabled             = true
   is_ipv6_enabled     = true
   comment             = var.project
-  default_root_object = "index"
+  default_root_object = "index.html"
 
   restrictions {
     geo_restriction {
