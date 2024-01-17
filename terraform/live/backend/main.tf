@@ -222,5 +222,19 @@ resource "aws_lambda_permission" "delete_note" {
 resource "aws_api_gateway_deployment" "notes_api" {
   rest_api_id = aws_api_gateway_rest_api.notes_api.id
 
+  triggers = {
+    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.notes_api.body))
+  }
+
   depends_on = [aws_lambda_permission.apigw, aws_api_gateway_method.create_note, aws_api_gateway_method.get_note, aws_api_gateway_method.delete_note]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "notes_api" {
+  deployment_id = aws_api_gateway_deployment.notes_api.id
+  rest_api_id   = aws_api_gateway_rest_api.notes_api.id
+  stage_name    = var.environment
 }
