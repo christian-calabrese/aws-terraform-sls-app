@@ -4,6 +4,8 @@
 locals {
   common_variables = {
     aws_region = var.aws_region
+    owner      = var.owner
+    project    = var.project
   }
 
   common_variables_descriptions = {
