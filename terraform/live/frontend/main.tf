@@ -6,7 +6,6 @@ module "s3_bucket" {
   version = "4.0.1"
 
   bucket        = "${var.project}-${var.environment}-fe"
-  acl           = "private"
   force_destroy = var.fe_bucket_force_destroy
 
   # S3 bucket-level Public Access Block configuration
@@ -114,17 +113,10 @@ resource "aws_cloudfront_distribution" "this" {
   }
   price_class = "PriceClass_100"
 
-  tags = {
-    Owner       = var.owner
-    Environment = var.environment
-    Terraform   = "true"
-  }
-
   dynamic "viewer_certificate" {
-    for_each = var.fe_alias == null ? [1] : []
+    for_each = var.fe_alias == null ? [] : [1]
     content {
       cloudfront_default_certificate = false
-
     }
   }
 
