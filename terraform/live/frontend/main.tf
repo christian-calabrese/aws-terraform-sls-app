@@ -114,9 +114,9 @@ resource "aws_cloudfront_distribution" "this" {
   price_class = "PriceClass_100"
 
   dynamic "viewer_certificate" {
-    for_each = var.fe_alias == null ? [] : [1]
+    for_each = var.fe_alias == null ? [1] : []
     content {
-      cloudfront_default_certificate = false
+      cloudfront_default_certificate = true
     }
   }
 
