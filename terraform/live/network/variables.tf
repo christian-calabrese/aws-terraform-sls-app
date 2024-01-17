@@ -66,10 +66,16 @@ variable "vpc_single_nat_gateway" {
 }
 
 ################################################################################
-# ACM Certificate
+# Route53
 ################################################################################
-variable "acm_domain_name" {
+variable "domain_name" {
   description = "The domain of the certificate to look up. If no certificate is found with this name, an error will be returned"
   type        = string
   default     = null
+}
+
+variable "create_private_hosted_zone" {
+  description = "Flag to enable or disable creation of private hosted zone"
+  type        = bool
+  default     = false
 }

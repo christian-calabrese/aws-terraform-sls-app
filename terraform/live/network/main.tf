@@ -18,17 +18,27 @@ module "vpc" {
 }
 
 ################################################################################
-# ACM Certificate
+# Route53
 ################################################################################
-module "acm" {
-  source  = "terraform-aws-modules/acm/aws"
-  version = "4.1.0"
+resource "aws_route53_zone" "public_zone" {
+  count   = var.domain_name == null ? 0 : 1
+  name    = var.environment == "prod" ? var.domain_name : "${var.environment}.${var.domain_name}"
+  comment = "Public zone of the domain"
+}
 
-  domain_name = var.acm_domain_name
+resource "aws_route53_zone" "private_zone" {
+  count   = var.create_private_hosted_zone ? 1 : 0
+  name    = var.domain_name
+  comment = "Private zone for vpc internal resolution"
 
-  subject_alternative_names = [
-    "*.${var.acm_domain_name}"
-  ]
+  vpc {
+    vpc_id = module.vpc.vpc_id
+  }
 
-  create_route53_records = true
+  # Prevent the deletion of associated VPCs after
+  # the initial creation. See documentation on
+  # aws_route53_zone_association for details
+  lifecycle {
+    ignore_changes = [vpc]
+  }
 }

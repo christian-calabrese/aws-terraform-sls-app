@@ -45,3 +45,33 @@ module "sls-app-network-eu-south-1-prod" {
   tag_names = ["region:${var.aws_region}", "environment:prod", "project:${var.project}", "provider:aws", "component:network"]
 
 }
+
+################################################################################
+# Frontend Workspaces
+################################################################################
+module "sls-app-frontend-eu-south-1-prod" {
+  source  = "flowingis/workspace/tfe"
+  version = "0.5.0"
+
+  name                      = "${var.project}-frontend-${var.aws_region}-prod"
+  organization              = var.organization
+  description               = "Common frontend resources for the production environment"
+  terraform_version         = "1.3.9"
+  execution_mode            = "remote"
+  queue_all_runs            = false
+  working_directory         = "terraform/live/frontend"
+  vcs_repository_identifier = "${var.owner}/aws-terraform-sls-app"
+  vcs_repository_branch     = "main"
+  oauth_token_id            = var.oauth_client_id
+
+  environment_sensitive_variables = {
+    AWS_ACCESS_KEY_ID     = var.aws_access_key_id
+    AWS_SECRET_ACCESS_KEY = var.aws_access_key_secret
+  }
+
+  terraform_variables = {}
+
+  tag_names = ["region:${var.aws_region}", "environment:prod", "project:${var.project}", "provider:aws", "component:frontend"]
+
+}
+
