@@ -8,13 +8,12 @@ module "s3_bucket" {
   bucket        = "${var.project}-${var.environment}-fe"
   force_destroy = var.fe_bucket_force_destroy
 
-  block_public_acls                     = true
-  block_public_policy                   = true
-  ignore_public_acls                    = true
-  restrict_public_buckets               = true
-  attach_deny_insecure_transport_policy = true                  #NOTE: see https://docs.aws.amazon.com/codepipeline/latest/userguide/S3-artifact-encryption.html
-  control_object_ownership              = true                  #NOTE: see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls
-  object_ownership                      = "BucketOwnerEnforced" #NOTE: ACLs are disabled, and the bucket owner automatically owns and has full control over every object in the bucket
+  block_public_acls        = true
+  block_public_policy      = true
+  ignore_public_acls       = true
+  restrict_public_buckets  = true
+  control_object_ownership = true                  #NOTE: see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls
+  object_ownership         = "BucketOwnerEnforced" #NOTE: ACLs are disabled, and the bucket owner automatically owns and has full control over every object in the bucket
 
   versioning = {
     enabled = var.fe_bucket_enable_versioning
