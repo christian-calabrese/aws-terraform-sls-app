@@ -149,10 +149,11 @@ resource "aws_api_gateway_method" "create_note" {
 }
 
 resource "aws_api_gateway_integration" "create_note" {
-  rest_api_id = aws_api_gateway_rest_api.notes_api.id
-  resource_id = aws_api_gateway_resource.note_resource.id
-  http_method = aws_api_gateway_method.create_note.http_method
-  type        = "AWS_PROXY"
+  rest_api_id             = aws_api_gateway_rest_api.notes_api.id
+  resource_id             = aws_api_gateway_resource.note_resource.id
+  http_method             = aws_api_gateway_method.create_note.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
 
   uri = aws_lambda_function.create_note.invoke_arn
 }
@@ -174,10 +175,11 @@ resource "aws_api_gateway_method" "get_note" {
 }
 
 resource "aws_api_gateway_integration" "get_note" {
-  rest_api_id = aws_api_gateway_rest_api.notes_api.id
-  resource_id = aws_api_gateway_resource.note_resource.id
-  http_method = aws_api_gateway_method.get_note.http_method
-  type        = "AWS_PROXY"
+  rest_api_id             = aws_api_gateway_rest_api.notes_api.id
+  resource_id             = aws_api_gateway_resource.note_resource.id
+  http_method             = aws_api_gateway_method.get_note.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
 
   uri = aws_lambda_function.get_note.invoke_arn
 }
@@ -199,10 +201,11 @@ resource "aws_api_gateway_method" "delete_note" {
 }
 
 resource "aws_api_gateway_integration" "delete_note" {
-  rest_api_id = aws_api_gateway_rest_api.notes_api.id
-  resource_id = aws_api_gateway_resource.note_resource.id
-  http_method = aws_api_gateway_method.delete_note.http_method
-  type        = "AWS_PROXY"
+  rest_api_id             = aws_api_gateway_rest_api.notes_api.id
+  resource_id             = aws_api_gateway_resource.note_resource.id
+  http_method             = aws_api_gateway_method.delete_note.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
 
   uri = aws_lambda_function.delete_note.invoke_arn
 }
@@ -219,5 +222,5 @@ resource "aws_lambda_permission" "delete_note" {
 resource "aws_api_gateway_deployment" "notes_api" {
   rest_api_id = aws_api_gateway_rest_api.notes_api.id
 
-  depends_on = [aws_lambda_permission.apigw, aws_api_gateway_method.create_note, aws_api_gateway_method.get_note, aws_api_gateway_method.delete_note, ]
+  depends_on = [aws_lambda_permission.apigw, aws_api_gateway_method.create_note, aws_api_gateway_method.get_note, aws_api_gateway_method.delete_note]
 }
