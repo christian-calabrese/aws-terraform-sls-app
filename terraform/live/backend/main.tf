@@ -115,20 +115,20 @@ resource "aws_lambda_function" "delete_note" {
 # API Gateway
 ################################################################################
 
-resource "aws_apigateway_rest_api" "notes_api" {
+resource "aws_api_gateway_rest_api" "notes_api" {
   name        = "${var.project}-${var.environment}-notes-api"
   description = "API for CRUD operations on notes"
 }
 
-resource "aws_apigateway_resource" "notes_resource" {
-  rest_api_id = aws_apigateway_rest_api.notes_api.id
-  parent_id   = aws_apigateway_rest_api.notes_api.root_resource_id
+resource "aws_api_gateway_resource" "notes_resource" {
+  rest_api_id = aws_api_gateway_rest_api.notes_api.id
+  parent_id   = aws_api_gateway_rest_api.notes_api.root_resource_id
   path_part   = "notes"
 }
 
-resource "aws_apigateway_resource" "note_resource" {
-  rest_api_id = aws_apigateway_rest_api.notes_api.id
-  parent_id   = aws_apigateway_resource.notes_resource.id
+resource "aws_api_gateway_resource" "note_resource" {
+  rest_api_id = aws_api_gateway_rest_api.notes_api.id
+  parent_id   = aws_api_gateway_resource.notes_resource.id
   path_part   = "{note_id}"
 }
 
@@ -138,47 +138,86 @@ resource "aws_lambda_permission" "apigw" {
   function_name = aws_lambda_function.get_note.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_apigateway_rest_api.notes_api.execution_arn}/*/*/notes/${aws_apigateway_resource.note_resource.path_part}"
+  source_arn = "${aws_api_gateway_rest_api.notes_api.execution_arn}/*/*/notes/${aws_api_gateway_resource.note_resource.path_part}"
 }
 
-resource "aws_apigateway_method" "create_note" {
-  rest_api_id   = aws_apigateway_rest_api.notes_api.id
-  resource_id   = aws_apigateway_resource.notes_resource.id
+resource "aws_api_gateway_method" "create_note" {
+  rest_api_id   = aws_api_gateway_rest_api.notes_api.id
+  resource_id   = aws_api_gateway_resource.notes_resource.id
   http_method   = "POST"
   authorization = "NONE"
-
-  integration {
-    type = "AWS_PROXY"
-    uri  = aws_lambda_function.create_note.invoke_arn
-  }
 }
 
-resource "aws_apigateway_method" "get_note" {
-  rest_api_id   = aws_apigateway_rest_api.notes_api.id
-  resource_id   = aws_apigateway_resource.note_resource.id
+resource "aws_api_gateway_integration" "create_note" {
+  rest_api_id = aws_api_gateway_rest_api.notes_api.id
+  resource_id = aws_api_gateway_resource.note_resource.id
+  http_method = aws_api_gateway_method.create_note.http_method
+  type        = "AWS_PROXY"
+
+  uri = aws_lambda_function.create_note.invoke_arn
+}
+
+resource "aws_lambda_permission" "create_note" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.create_note.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = aws_api_gateway_rest_api.notes_api.execution_arn
+}
+
+resource "aws_api_gateway_method" "get_note" {
+  rest_api_id   = aws_api_gateway_rest_api.notes_api.id
+  resource_id   = aws_api_gateway_resource.note_resource.id
   http_method   = "GET"
   authorization = "NONE"
-
-  integration {
-    type = "AWS_PROXY"
-    uri  = aws_lambda_function.get_note.invoke_arn
-  }
 }
 
-resource "aws_apigateway_method" "delete_note" {
-  rest_api_id   = aws_apigateway_rest_api.notes_api.id
-  resource_id   = aws_apigateway_resource.note_resource.id
+resource "aws_api_gateway_integration" "get_note" {
+  rest_api_id = aws_api_gateway_rest_api.notes_api.id
+  resource_id = aws_api_gateway_resource.note_resource.id
+  http_method = aws_api_gateway_method.get_note.http_method
+  type        = "AWS_PROXY"
+
+  uri = aws_lambda_function.get_note.invoke_arn
+}
+
+resource "aws_lambda_permission" "get_note" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_note.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = aws_api_gateway_rest_api.notes_api.execution_arn
+}
+
+resource "aws_api_gateway_method" "delete_note" {
+  rest_api_id   = aws_api_gateway_rest_api.notes_api.id
+  resource_id   = aws_api_gateway_resource.note_resource.id
   http_method   = "DELETE"
   authorization = "NONE"
+}
 
-  integration {
-    type = "AWS_PROXY"
-    uri  = aws_lambda_function.delete_note.invoke_arn
-  }
+resource "aws_api_gateway_integration" "delete_note" {
+  rest_api_id = aws_api_gateway_rest_api.notes_api.id
+  resource_id = aws_api_gateway_resource.note_resource.id
+  http_method = aws_api_gateway_method.delete_note.http_method
+  type        = "AWS_PROXY"
+
+  uri = aws_lambda_function.delete_note.invoke_arn
+}
+
+resource "aws_lambda_permission" "delete_note" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.delete_note.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = aws_api_gateway_rest_api.notes_api.execution_arn
 }
 
 resource "aws_api_gateway_deployment" "notes_api" {
-  rest_api_id = aws_apigateway_rest_api.notes_api.id
+  rest_api_id = aws_api_gateway_rest_api.notes_api.id
 
-  depends_on = [aws_lambda_permission.apigw, aws_apigateway_method.create_note, aws_apigateway_method.get_note, aws_apigateway_method.delete_note, ]
+  depends_on = [aws_lambda_permission.apigw, aws_api_gateway_method.create_note, aws_api_gateway_method.get_note, aws_api_gateway_method.delete_note, ]
 }
