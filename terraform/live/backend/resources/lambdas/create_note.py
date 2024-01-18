@@ -12,7 +12,12 @@ def lambda_handler(event, context):
     if 'title' not in data:
         return {
             'statusCode': 400,
-            'body': json.dumps({'error': 'title is required'})
+            'body': json.dumps({'error': 'title is required'}),
+            'headers': {
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+            }
         }
     note = {
         'note_id': str(uuid.uuid4()),
@@ -22,5 +27,10 @@ def lambda_handler(event, context):
     table.put_item(Item=note)
     return {
         'statusCode': 201,
-        'body': json.dumps(note)
+        'body': json.dumps(note),
+        'headers': {
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+        }
     }

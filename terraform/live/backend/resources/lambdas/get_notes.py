@@ -11,9 +11,19 @@ def lambda_handler(event, context):
     if 'Items' not in response:
         return {
             'statusCode': 404,
-            'body': json.dumps({'error': 'Notes not found'})
+            'body': json.dumps({'error': 'Notes not found'}),
+            'headers': {
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+            }
         }
     return {
         'statusCode': 200,
-        'body': json.dumps(response['Items'])
+        'body': json.dumps(response['Items']),
+        'headers': {
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+        }
     }

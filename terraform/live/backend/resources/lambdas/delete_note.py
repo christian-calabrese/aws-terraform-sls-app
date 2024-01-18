@@ -12,9 +12,19 @@ def lambda_handler(event, context):
     if 'Item' not in response:
         return {
             'statusCode': 404,
-            'body': json.dumps({'error': 'Note not found'})
+            'body': json.dumps({'error': 'Note not found'}),
+            'headers': {
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+            }
         }
     return {
         'statusCode': 204,
-        'body': ''
+        'body': '',
+        'headers': {
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+        }
     }
