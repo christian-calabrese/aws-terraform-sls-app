@@ -83,6 +83,20 @@ resource "aws_lambda_function" "create_note" {
   }
 }
 
+resource "aws_lambda_function" "get_notes" {
+  filename      = data.archive_file.lambda_code.output_path
+  function_name = "${var.project}-${var.environment}-get-notes"
+  role          = aws_iam_role.lambda_notes.arn
+  handler       = "get_notes.lambda_handler"
+  runtime       = "python3.11"
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.notes.name
+    }
+  }
+}
+
 resource "aws_lambda_function" "get_note" {
   filename      = data.archive_file.lambda_code.output_path
   function_name = "${var.project}-${var.environment}-get-note"
@@ -162,6 +176,32 @@ resource "aws_lambda_permission" "create_note" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.create_note.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = aws_api_gateway_rest_api.notes_api.execution_arn
+}
+
+resource "aws_api_gateway_method" "get_notes" {
+  rest_api_id   = aws_api_gateway_rest_api.notes_api.id
+  resource_id   = aws_api_gateway_resource.notes_resource.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "get_notes" {
+  rest_api_id             = aws_api_gateway_rest_api.notes_api.id
+  resource_id             = aws_api_gateway_resource.notes_resource.id
+  http_method             = aws_api_gateway_method.get_notes.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+
+  uri = aws_lambda_function.get_notes.invoke_arn
+}
+
+resource "aws_lambda_permission" "get_notes" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_notes.function_name
   principal     = "apigateway.amazonaws.com"
 
   source_arn = aws_api_gateway_rest_api.notes_api.execution_arn
