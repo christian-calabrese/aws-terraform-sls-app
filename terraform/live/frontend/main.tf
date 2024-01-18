@@ -21,7 +21,7 @@ module "s3_bucket" {
 }
 
 
-resource "aws_s3_bucket_object" "index" {
+resource "aws_s3_object" "index" {
   bucket       = module.s3_bucket.s3_bucket_id
   key          = "index.html"
   content      = replace(file("${path.module}/resources/webapp/index.html"), "{{API_ENDPOINT}}", data.tfe_outputs.backend.values.api_endpoint)
