@@ -278,7 +278,7 @@ resource "aws_api_gateway_deployment" "notes_api" {
     redeployment = sha1(jsonencode(aws_api_gateway_rest_api.notes_api.body))
   }
 
-  depends_on = [aws_lambda_permission.apigw, aws_api_gateway_method.create_note, aws_api_gateway_method.get_note, aws_api_gateway_method.delete_note]
+  depends_on = [aws_lambda_permission.create_note, aws_lambda_permission.get_notes, aws_lambda_permission.get_note, aws_lambda_permission.delete_note, aws_api_gateway_method.create_note, aws_api_gateway_method.get_notes, aws_api_gateway_method.get_note, aws_api_gateway_method.delete_note]
 
   lifecycle {
     create_before_destroy = true
