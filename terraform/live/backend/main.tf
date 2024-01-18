@@ -59,8 +59,8 @@ resource "aws_iam_policy" "lambda_dynamodb_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  role       = aws_iam_role.iam_for_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  role       = aws_iam_role.lambda_notes.name
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_dynamodb_attachment" {
