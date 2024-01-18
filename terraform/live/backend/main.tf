@@ -289,6 +289,13 @@ resource "aws_api_gateway_stage" "notes_api" {
   deployment_id = aws_api_gateway_deployment.notes_api.id
   rest_api_id   = aws_api_gateway_rest_api.notes_api.id
   stage_name    = var.environment
+
+  depends_on = [aws_cloudwatch_log_group.api_gateway]
+}
+
+resource "aws_cloudwatch_log_group" "api_gateway" {
+  name              = "API-Gateway-Execution-Logs_${aws_api_gateway_rest_api.notes_api.id}/${var.environment}"
+  retention_in_days = 7
 }
 
 module "cors" {
