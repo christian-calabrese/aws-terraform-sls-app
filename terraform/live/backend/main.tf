@@ -278,3 +278,11 @@ resource "aws_api_gateway_stage" "notes_api" {
   rest_api_id   = aws_api_gateway_rest_api.notes_api.id
   stage_name    = var.environment
 }
+
+module "cors" {
+  source  = "squidfunk/api-gateway-enable-cors/aws"
+  version = "0.3.3"
+
+  api_id          = aws_api_gateway_rest_api.notes_api.id
+  api_resource_id = aws_api_gateway_resource.note_resource.id
+}
