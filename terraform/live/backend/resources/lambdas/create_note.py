@@ -15,7 +15,7 @@ def lambda_handler(event, context):
             'body': json.dumps({'error': 'title is required'}),
             'headers': {
                 'Access-Control-Allow-Headers': 'Content-Type',
-                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Origin': os.environ['CUSTOM_DOMAIN_NAME'] if os.environ.get('CUSTOM_DOMAIN_NAME', '') != '' else '*',
                 'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
             }
         }
@@ -30,7 +30,7 @@ def lambda_handler(event, context):
         'body': json.dumps(note),
         'headers': {
             'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Origin': os.environ['CUSTOM_DOMAIN_NAME'] if os.environ.get('CUSTOM_DOMAIN_NAME', '') != '' else '*',
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         }
     }

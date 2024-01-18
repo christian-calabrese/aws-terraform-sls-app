@@ -84,7 +84,8 @@ resource "aws_lambda_function" "create_note" {
 
   environment {
     variables = {
-      DYNAMODB_TABLE = aws_dynamodb_table.notes.name
+      DYNAMODB_TABLE     = aws_dynamodb_table.notes.name
+      CUSTOM_DOMAIN_NAME = var.domain_name != null ? var.domain_name : ""
     }
   }
 
@@ -103,7 +104,8 @@ resource "aws_lambda_function" "get_notes" {
 
   environment {
     variables = {
-      DYNAMODB_TABLE = aws_dynamodb_table.notes.name
+      DYNAMODB_TABLE     = aws_dynamodb_table.notes.name
+      CUSTOM_DOMAIN_NAME = var.domain_name != null ? var.domain_name : ""
     }
   }
 
@@ -122,7 +124,8 @@ resource "aws_lambda_function" "get_note" {
 
   environment {
     variables = {
-      DYNAMODB_TABLE = aws_dynamodb_table.notes.name
+      DYNAMODB_TABLE     = aws_dynamodb_table.notes.name
+      CUSTOM_DOMAIN_NAME = var.domain_name != null ? var.domain_name : ""
     }
   }
 
@@ -141,7 +144,8 @@ resource "aws_lambda_function" "delete_note" {
 
   environment {
     variables = {
-      DYNAMODB_TABLE = aws_dynamodb_table.notes.name
+      DYNAMODB_TABLE     = aws_dynamodb_table.notes.name
+      CUSTOM_DOMAIN_NAME = var.domain_name != null ? var.domain_name : ""
     }
   }
 
