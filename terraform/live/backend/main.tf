@@ -76,7 +76,7 @@ data "archive_file" "lambda_code" {
 
 resource "aws_lambda_function" "create_note" {
   filename         = data.archive_file.lambda_code.output_path
-  source_code_hash = data.archive_file.lambda.output_base64sha256
+  source_code_hash = data.archive_file.lambda_code.output_base64sha256
   function_name    = "${var.project}-${var.environment}-create-note"
   role             = aws_iam_role.lambda_notes.arn
   handler          = "create_note.lambda_handler"
@@ -95,7 +95,7 @@ resource "aws_lambda_function" "create_note" {
 
 resource "aws_lambda_function" "get_notes" {
   filename         = data.archive_file.lambda_code.output_path
-  source_code_hash = data.archive_file.lambda.output_base64sha256
+  source_code_hash = data.archive_file.lambda_code.output_base64sha256
   function_name    = "${var.project}-${var.environment}-get-notes"
   role             = aws_iam_role.lambda_notes.arn
   handler          = "get_notes.lambda_handler"
@@ -114,7 +114,7 @@ resource "aws_lambda_function" "get_notes" {
 
 resource "aws_lambda_function" "get_note" {
   filename         = data.archive_file.lambda_code.output_path
-  source_code_hash = data.archive_file.lambda.output_base64sha256
+  source_code_hash = data.archive_file.lambda_code.output_base64sha256
   function_name    = "${var.project}-${var.environment}-get-note"
   role             = aws_iam_role.lambda_notes.arn
   handler          = "get_note.lambda_handler"
@@ -133,7 +133,7 @@ resource "aws_lambda_function" "get_note" {
 
 resource "aws_lambda_function" "delete_note" {
   filename         = data.archive_file.lambda_code.output_path
-  source_code_hash = data.archive_file.lambda.output_base64sha256
+  source_code_hash = data.archive_file.lambda_code.output_base64sha256
   function_name    = "${var.project}-${var.environment}-delete-note"
   role             = aws_iam_role.lambda_notes.arn
   handler          = "delete_note.lambda_handler"
