@@ -16,6 +16,10 @@ module "sls-app-network-eu-south-1-prod" {
   vcs_repository_branch     = "main"
   oauth_token_id            = var.oauth_client_id
 
+  remote_state_consumer_ids = [
+    module.sls-app-backend-eu-south-1-prod.id
+  ]
+
   environment_sensitive_variables = {
     AWS_ACCESS_KEY_ID     = var.aws_access_key_id
     AWS_SECRET_ACCESS_KEY = var.aws_access_key_secret
@@ -96,7 +100,8 @@ module "sls-app-backend-eu-south-1-prod" {
   oauth_token_id            = var.oauth_client_id
 
   remote_state_consumer_ids = [
-    module.sls-app-frontend-eu-south-1-prod.id
+    module.sls-app-frontend-eu-south-1-prod.id,
+    module.sls-app-waf-eu-south-1-prod.id
   ]
 
   environment_sensitive_variables = {
@@ -112,3 +117,33 @@ module "sls-app-backend-eu-south-1-prod" {
 
 }
 
+################################################################################
+# WAF Workspaces
+################################################################################
+module "sls-app-waf-eu-south-1-prod" {
+  source  = "flowingis/workspace/tfe"
+  version = "0.5.0"
+
+  name                      = "${var.project}-waf-${var.aws_region}-prod"
+  organization              = var.organization
+  description               = "Common waf resources for the production environment"
+  terraform_version         = "1.3.9"
+  execution_mode            = "remote"
+  queue_all_runs            = false
+  working_directory         = "terraform/live/waf"
+  vcs_repository_identifier = "${var.owner}/aws-terraform-sls-app"
+  vcs_repository_branch     = "main"
+  oauth_token_id            = var.oauth_client_id
+
+  environment_sensitive_variables = {
+    AWS_ACCESS_KEY_ID     = var.aws_access_key_id
+    AWS_SECRET_ACCESS_KEY = var.aws_access_key_secret
+  }
+
+  terraform_variables = {
+    environment = "prod"
+  }
+
+  tag_names = ["region:${var.aws_region}", "environment:prod", "project:${var.project}", "provider:aws", "component:waf"]
+
+}
