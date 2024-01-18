@@ -20,16 +20,13 @@ module "s3_bucket" {
   }
 }
 
+
 resource "aws_s3_bucket_object" "index" {
   bucket       = module.s3_bucket.s3_bucket_id
   key          = "index.html"
-  source       = "${path.module}/resources/webapp/index.html"
+  source       = replace(file("${path.module}/resources/webapp/index.html"), "{{API_ENDPOINT}}", data.tfe_outputs.backend.values.api_endpoint)
   content_type = "text/html"
-
-  # The filemd5() function is available in Terraform 0.11.12 and later
-  # For Terraform 0.11.11 and earlier, use the md5() function and the file() function:
-  # etag = "${md5(file("path/to/file"))}"
-  etag = filemd5("${path.module}/resources/webapp/index.html")
+  etag         = filemd5("${path.module}/resources/webapp/index.html")
 }
 
 resource "aws_s3_bucket_policy" "cloudfront_access" {

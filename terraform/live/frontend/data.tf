@@ -14,3 +14,8 @@ data "aws_iam_policy_document" "bucket_policy" {
     }
   }
 }
+
+data "tfe_outputs" "backend" {
+  organization = var.organization
+  workspace    = "${var.project}-backend-${var.aws_region}-${var.environment}"
+}
