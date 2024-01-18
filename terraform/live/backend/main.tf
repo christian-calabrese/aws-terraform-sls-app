@@ -186,6 +186,8 @@ resource "aws_api_gateway_method_settings" "notes_api" {
   settings {
     logging_level = "ERROR"
   }
+
+  depends_on = [aws_api_gateway_account.main]
 }
 
 resource "aws_api_gateway_rest_api" "notes_api" {
