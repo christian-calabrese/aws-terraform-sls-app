@@ -35,3 +35,14 @@ variable "oauth_client_id" {
 ################################################################################
 # Backend variables
 ################################################################################
+variable "domain_name" {
+  description = "The domain name used to publish the api gateway"
+  type        = string
+  default     = null
+}
+
+variable "api_gateway_scope" {
+  description = "The scope of the api gateway. It can be REGIONAL or EDGE"
+  type        = string
+  default     = "REGIONAL"
+}

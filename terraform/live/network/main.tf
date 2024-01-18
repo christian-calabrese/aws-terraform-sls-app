@@ -42,3 +42,20 @@ resource "aws_route53_zone" "private_zone" {
     ignore_changes = [vpc]
   }
 }
+
+################################################################################
+# ACM
+################################################################################
+module "acm" {
+  count   = var.domain_name == null ? 0 : 1
+  source  = "terraform-aws-modules/acm/aws"
+  version = "4.1.0"
+
+  domain_name = var.domain_name
+
+  subject_alternative_names = [
+    "*.${var.domain_name}"
+  ]
+
+  create_route53_records = true
+}
