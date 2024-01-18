@@ -58,6 +58,11 @@ resource "aws_iam_policy" "lambda_dynamodb_policy" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_logs" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_dynamodb_attachment" {
   policy_arn = aws_iam_policy.lambda_dynamodb_policy.arn
   role       = aws_iam_role.lambda_notes.name
@@ -81,6 +86,10 @@ resource "aws_lambda_function" "create_note" {
       DYNAMODB_TABLE = aws_dynamodb_table.notes.name
     }
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_logs
+  ]
 }
 
 resource "aws_lambda_function" "get_notes" {
@@ -95,6 +104,10 @@ resource "aws_lambda_function" "get_notes" {
       DYNAMODB_TABLE = aws_dynamodb_table.notes.name
     }
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_logs
+  ]
 }
 
 resource "aws_lambda_function" "get_note" {
@@ -109,6 +122,10 @@ resource "aws_lambda_function" "get_note" {
       DYNAMODB_TABLE = aws_dynamodb_table.notes.name
     }
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_logs
+  ]
 }
 
 resource "aws_lambda_function" "delete_note" {
@@ -123,6 +140,10 @@ resource "aws_lambda_function" "delete_note" {
       DYNAMODB_TABLE = aws_dynamodb_table.notes.name
     }
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_logs
+  ]
 }
 
 ################################################################################
