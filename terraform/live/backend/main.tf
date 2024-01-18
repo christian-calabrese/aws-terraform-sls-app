@@ -167,15 +167,6 @@ resource "aws_api_gateway_resource" "note_resource" {
   path_part   = "{note_id}"
 }
 
-resource "aws_lambda_permission" "apigw" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.get_note.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_api_gateway_rest_api.notes_api.execution_arn}/*/*/notes/${aws_api_gateway_resource.note_resource.path_part}"
-}
-
 resource "aws_api_gateway_method" "create_note" {
   rest_api_id   = aws_api_gateway_rest_api.notes_api.id
   resource_id   = aws_api_gateway_resource.notes_resource.id
@@ -199,7 +190,7 @@ resource "aws_lambda_permission" "create_note" {
   function_name = aws_lambda_function.create_note.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = aws_api_gateway_rest_api.notes_api.execution_arn
+  source_arn = "${aws_api_gateway_rest_api.notes_api.execution_arn}/*"
 }
 
 resource "aws_api_gateway_method" "get_notes" {
@@ -225,7 +216,7 @@ resource "aws_lambda_permission" "get_notes" {
   function_name = aws_lambda_function.get_notes.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = aws_api_gateway_rest_api.notes_api.execution_arn
+  source_arn = "${aws_api_gateway_rest_api.notes_api.execution_arn}/*"
 }
 
 resource "aws_api_gateway_method" "get_note" {
@@ -251,7 +242,7 @@ resource "aws_lambda_permission" "get_note" {
   function_name = aws_lambda_function.get_note.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = aws_api_gateway_rest_api.notes_api.execution_arn
+  source_arn = "${aws_api_gateway_rest_api.notes_api.execution_arn}/*"
 }
 
 resource "aws_api_gateway_method" "delete_note" {
@@ -277,7 +268,7 @@ resource "aws_lambda_permission" "delete_note" {
   function_name = aws_lambda_function.delete_note.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = aws_api_gateway_rest_api.notes_api.execution_arn
+  source_arn = "${aws_api_gateway_rest_api.notes_api.execution_arn}/*"
 }
 
 resource "aws_api_gateway_deployment" "notes_api" {
