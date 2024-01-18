@@ -69,7 +69,7 @@ variable "vpc_single_nat_gateway" {
 # Route53
 ################################################################################
 variable "domain_name" {
-  description = "The domain of the certificate to look up. If no certificate is found with this name, an error will be returned"
+  description = "The domain name used to publish the api gateway"
   type        = string
   default     = null
 }

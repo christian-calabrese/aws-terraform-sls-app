@@ -349,3 +349,41 @@ module "cors" {
   api_id          = aws_api_gateway_rest_api.notes_api.id
   api_resource_id = aws_api_gateway_resource.note_resource.id
 }
+
+################################################################################
+# API Gateway Custom Domain
+################################################################################
+
+resource "aws_api_gateway_domain_name" "notes_api" {
+  count = var.domain_name == null ? 0 : 1
+
+  domain_name     = var.domain_name
+  certificate_arn = data.tfe_outputs.network.values.acm_certificate_arn
+
+  endpoint_configuration {
+    types = [var.api_gateway_scope]
+  }
+}
+
+resource "aws_api_gateway_base_path_mapping" "notes_api" {
+  count = var.domain_name == null ? 0 : 1
+
+  api_id      = aws_api_gateway_rest_api.notes_api.id
+  stage_name  = aws_api_gateway_stage.notes_api.stage_name
+  domain_name = aws_api_gateway_domain_name.notes_api.id
+
+}
+
+resource "aws_route53_record" "notes_api" {
+  count = var.domain_name == null ? 0 : 1
+
+  name    = aws_api_gateway_domain_name.notes_api.domain_name
+  type    = "A"
+  zone_id = data.tfe_outputs.network.values.public_zone_id
+
+  alias {
+    evaluate_target_health = true
+    name                   = var.api_gateway_scope == "REGIONAL" ? aws_api_gateway_domain_name.notes_api.regional_domain_name : aws_api_gateway_domain_name.notes_api.cloudfront_domain_name
+    zone_id                = var.api_gateway_scope == "REGIONAL" ? aws_api_gateway_domain_name.notes_api.regional_zone_id : aws_api_gateway_domain_name.notes_api.cloudfront_zone_id
+  }
+}
