@@ -20,7 +20,7 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         BranchName       = { dev = "develop", prod = "main" }[var.environment]
-        ConnectionArn    = data.terraform_remote_state.codebuildsourcecredentials.outputs.aws_codestarconnections_connection_github_arn
+        ConnectionArn    = data.tfe_outputs.frontend.values.aws_codestarconnections_connection_github_arn
         FullRepositoryId = "${var.fe_repository_owner}/${var.fe_repository_name}"
       }
     }

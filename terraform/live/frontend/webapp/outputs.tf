@@ -20,3 +20,7 @@ output "fe_cloudfront_distribution_arn" {
   description = "The arn of the cloudfront distribution publishing the frontend webapp"
   value       = aws_cloudfront_distribution.this.arn
 }
+
+output "aws_codestarconnections_connection_github_arn" {
+  value = aws_codestarconnections_connection.github.arn
+}

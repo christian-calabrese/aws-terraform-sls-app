@@ -391,3 +391,13 @@ resource "aws_route53_record" "notes_api" {
     zone_id                = var.api_gateway_scope == "REGIONAL" ? aws_api_gateway_domain_name.notes_api.regional_zone_id : aws_api_gateway_domain_name.notes_api.cloudfront_zone_id
   }
 }
+
+################################################################################
+# Additional resources
+################################################################################
+#The aws_codestarconnections_connection resource is created in the state PENDING.
+#Authentication with the connection provider must be completed in the AWS Console.
+resource "aws_codestarconnections_connection" "github" {
+  name          = "${var.project}-${var.environment}-github-codestar-connection-frontend"
+  provider_type = "GitHub"
+}

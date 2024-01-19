@@ -10,3 +10,7 @@ output "api_stage_arn" {
   description = "The arn of the REST API stage"
   value       = aws_api_gateway_stage.notes_api.arn
 }
+
+output "aws_codestarconnections_connection_github_arn" {
+  value = aws_codestarconnections_connection.github.arn
+}

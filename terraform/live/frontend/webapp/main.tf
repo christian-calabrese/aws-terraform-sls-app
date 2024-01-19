@@ -129,3 +129,13 @@ resource "aws_cloudfront_distribution" "this" {
     }
   }
 }
+
+################################################################################
+# Additional resources
+################################################################################
+#The aws_codestarconnections_connection resource is created in the state PENDING.
+#Authentication with the connection provider must be completed in the AWS Console.
+resource "aws_codestarconnections_connection" "github" {
+  name          = "${var.project}-${var.environment}-github-codestar-connection-frontend"
+  provider_type = "GitHub"
+}
