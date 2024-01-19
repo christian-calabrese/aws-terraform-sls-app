@@ -8,7 +8,7 @@ output "fe_s3_bucket_name" {
 
 output "fe_s3_bucket_arn" {
   description = "The arn of the bucket containing the frontend webapp"
-  value       = module.s3_bucket.fe_s3_bucket_arn
+  value       = module.s3_bucket.s3_bucket_arn
 }
 
 output "fe_cloudfront_distribution_id" {
