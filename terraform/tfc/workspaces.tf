@@ -68,6 +68,10 @@ module "sls-app-frontend-eu-south-1-prod" {
   vcs_repository_branch     = "main"
   oauth_token_id            = var.oauth_client_id
 
+  remote_state_consumer_ids = [
+    module.sls-app-frontend-cicd-eu-south-1-prod.id,
+  ]
+
   environment_sensitive_variables = {
     AWS_ACCESS_KEY_ID     = var.aws_access_key_id
     AWS_SECRET_ACCESS_KEY = var.aws_access_key_secret
