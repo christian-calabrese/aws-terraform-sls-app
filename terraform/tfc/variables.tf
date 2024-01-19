@@ -41,6 +41,18 @@ variable "repository_name" {
   default     = "aws-terraform-sls-app"
 }
 
+variable "be_repository_name" {
+  description = "Name of the git repository containing the backend code"
+  type        = string
+  default     = "aws-terraform-sls-app-backend"
+}
+
+variable "fe_repository_name" {
+  description = "Name of the git repository containing the frontend code"
+  type        = string
+  default     = "aws-terraform-sls-app-frontend"
+}
+
 
 ################################################################################
 # Variable Set

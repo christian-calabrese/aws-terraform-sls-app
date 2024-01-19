@@ -74,79 +74,21 @@ data "archive_file" "lambda_code" {
   output_path = "${path.module}/backend.zip"
 }
 
-resource "aws_lambda_function" "create_note" {
+resource "aws_lambda_function" "functions" {
+  for_each         = { for i, f in var.functions : f.name => f }
   filename         = data.archive_file.lambda_code.output_path
   source_code_hash = data.archive_file.lambda_code.output_base64sha256
-  function_name    = "${var.project}-${var.environment}-create-note"
+  function_name    = "${var.project}-${var.environment}-${each.value.name}"
   role             = aws_iam_role.lambda_notes.arn
-  handler          = "create_note.lambda_handler"
-  runtime          = "python3.11"
+  handler          = each.value.handler
+  runtime          = each.value.runtime
+  timeout          = each.value.timeout
+  publish          = true
 
   environment {
-    variables = {
-      DYNAMODB_TABLE     = aws_dynamodb_table.notes.name
-      CUSTOM_DOMAIN_NAME = var.domain_name != null ? var.domain_name : ""
-    }
-  }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.lambda_logs
-  ]
-}
-
-resource "aws_lambda_function" "get_notes" {
-  filename         = data.archive_file.lambda_code.output_path
-  source_code_hash = data.archive_file.lambda_code.output_base64sha256
-  function_name    = "${var.project}-${var.environment}-get-notes"
-  role             = aws_iam_role.lambda_notes.arn
-  handler          = "get_notes.lambda_handler"
-  runtime          = "python3.11"
-
-  environment {
-    variables = {
-      DYNAMODB_TABLE     = aws_dynamodb_table.notes.name
-      CUSTOM_DOMAIN_NAME = var.domain_name != null ? var.domain_name : ""
-    }
-  }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.lambda_logs
-  ]
-}
-
-resource "aws_lambda_function" "get_note" {
-  filename         = data.archive_file.lambda_code.output_path
-  source_code_hash = data.archive_file.lambda_code.output_base64sha256
-  function_name    = "${var.project}-${var.environment}-get-note"
-  role             = aws_iam_role.lambda_notes.arn
-  handler          = "get_note.lambda_handler"
-  runtime          = "python3.11"
-
-  environment {
-    variables = {
-      DYNAMODB_TABLE     = aws_dynamodb_table.notes.name
-      CUSTOM_DOMAIN_NAME = var.domain_name != null ? var.domain_name : ""
-    }
-  }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.lambda_logs
-  ]
-}
-
-resource "aws_lambda_function" "delete_note" {
-  filename         = data.archive_file.lambda_code.output_path
-  source_code_hash = data.archive_file.lambda_code.output_base64sha256
-  function_name    = "${var.project}-${var.environment}-delete-note"
-  role             = aws_iam_role.lambda_notes.arn
-  handler          = "delete_note.lambda_handler"
-  runtime          = "python3.11"
-
-  environment {
-    variables = {
-      DYNAMODB_TABLE     = aws_dynamodb_table.notes.name
-      CUSTOM_DOMAIN_NAME = var.domain_name != null ? var.domain_name : ""
-    }
+    variables = merge({
+      DYNAMODB_TABLE = aws_dynamodb_table.notes.name
+    }, each.value.environment)
   }
 
   depends_on = [
@@ -215,108 +157,36 @@ resource "aws_api_gateway_resource" "note_resource" {
   path_part   = "{note_id}"
 }
 
-resource "aws_api_gateway_method" "create_note" {
-  rest_api_id   = aws_api_gateway_rest_api.notes_api.id
-  resource_id   = aws_api_gateway_resource.notes_resource.id
-  http_method   = "POST"
-  authorization = "NONE"
+resource "aws_api_gateway_method" "functions" {
+  for_each       = { for i, f in var.functions : f.name => f }
+  rest_api_id    = aws_api_gateway_rest_api.notes_api.id
+  resource_id    = aws_api_gateway_resource.notes_resource.id
+  http_method    = each.value.http_method
+  authorization  = "NONE"
+  operation_name = "${each.value.name}-operation"
 }
 
-resource "aws_api_gateway_integration" "create_note" {
+resource "aws_api_gateway_integration" "functions" {
+  for_each                = { for i, f in var.functions : f.name => f }
   rest_api_id             = aws_api_gateway_rest_api.notes_api.id
   resource_id             = aws_api_gateway_resource.notes_resource.id
-  http_method             = aws_api_gateway_method.create_note.http_method
+  http_method             = each.value.http_method
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
+  uri                     = aws_lambda_function.functions[each.key].invoke_arn
 
-  uri = aws_lambda_function.create_note.invoke_arn
+  depends_on = [
+    aws_lambda_permission.functions[each.key]
+  ]
 }
 
-resource "aws_lambda_permission" "create_note" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+resource "aws_lambda_permission" "functions" {
+  for_each      = { for i, f in var.functions : f.name => f }
+  statement_id  = "AllowExecutionFromAPIGateway-${each.key}"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.create_note.function_name
+  function_name = aws_lambda_function.functions[each.key].function_name
   principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_api_gateway_rest_api.notes_api.execution_arn}/*"
-}
-
-resource "aws_api_gateway_method" "get_notes" {
-  rest_api_id   = aws_api_gateway_rest_api.notes_api.id
-  resource_id   = aws_api_gateway_resource.notes_resource.id
-  http_method   = "GET"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "get_notes" {
-  rest_api_id             = aws_api_gateway_rest_api.notes_api.id
-  resource_id             = aws_api_gateway_resource.notes_resource.id
-  http_method             = aws_api_gateway_method.get_notes.http_method
-  type                    = "AWS_PROXY"
-  integration_http_method = "POST"
-
-  uri = aws_lambda_function.get_notes.invoke_arn
-}
-
-resource "aws_lambda_permission" "get_notes" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.get_notes.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_api_gateway_rest_api.notes_api.execution_arn}/*"
-}
-
-resource "aws_api_gateway_method" "get_note" {
-  rest_api_id   = aws_api_gateway_rest_api.notes_api.id
-  resource_id   = aws_api_gateway_resource.note_resource.id
-  http_method   = "GET"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "get_note" {
-  rest_api_id             = aws_api_gateway_rest_api.notes_api.id
-  resource_id             = aws_api_gateway_resource.note_resource.id
-  http_method             = aws_api_gateway_method.get_note.http_method
-  type                    = "AWS_PROXY"
-  integration_http_method = "POST"
-
-  uri = aws_lambda_function.get_note.invoke_arn
-}
-
-resource "aws_lambda_permission" "get_note" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.get_note.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_api_gateway_rest_api.notes_api.execution_arn}/*"
-}
-
-resource "aws_api_gateway_method" "delete_note" {
-  rest_api_id   = aws_api_gateway_rest_api.notes_api.id
-  resource_id   = aws_api_gateway_resource.note_resource.id
-  http_method   = "DELETE"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "delete_note" {
-  rest_api_id             = aws_api_gateway_rest_api.notes_api.id
-  resource_id             = aws_api_gateway_resource.note_resource.id
-  http_method             = aws_api_gateway_method.delete_note.http_method
-  type                    = "AWS_PROXY"
-  integration_http_method = "POST"
-
-  uri = aws_lambda_function.delete_note.invoke_arn
-}
-
-resource "aws_lambda_permission" "delete_note" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.delete_note.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_api_gateway_rest_api.notes_api.execution_arn}/*"
+  source_arn    = "${aws_api_gateway_rest_api.notes_api.execution_arn}/*/${each.value.http_method}${each.value.path_part}"
 }
 
 resource "aws_api_gateway_deployment" "notes_api" {

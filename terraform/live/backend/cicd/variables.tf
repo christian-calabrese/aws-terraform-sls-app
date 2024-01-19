@@ -33,8 +33,18 @@ variable "oauth_client_id" {
 
 
 ################################################################################
-# Backend variables
+# Backend CI/CD variables
 ################################################################################
+variable "be_repository_name" {
+  description = "Name of the git repository"
+  type        = string
+}
+
+variable "be_repository_owner" {
+  description = "Owner of the git repository"
+  type        = string
+}
+
 variable "functions" {
   description = "List of functions and their configurations"
 
@@ -49,14 +59,23 @@ variable "functions" {
   }))
 }
 
-variable "domain_name" {
-  description = "The domain name used to publish the api gateway"
-  type        = string
-  default     = null
-}
+variable "be_deployment_strategy" {
+  type    = string
+  default = "CodeDeployDefault.LambdaAllAtOnce"
 
-variable "api_gateway_scope" {
-  description = "The scope of the api gateway. It can be REGIONAL or EDGE"
-  type        = string
-  default     = "REGIONAL"
+  validation {
+    condition = contains(
+      [
+        "CodeDeployDefault.LambdaAllAtOnce",
+        "CodeDeployDefault.LambdaCanary10Percent5Minutes",
+        "CodeDeployDefault.LambdaCanary10Percent10Minutes",
+        "CodeDeployDefault.LambdaCanary10Percent15Minutes",
+        "CodeDeployDefault.LambdaCanary10Percent30Minutes",
+        "CodeDeployDefault.LambdaLinear10PercentEvery1Minute",
+        "CodeDeployDefault.LambdaLinear10PercentEvery2Minutes",
+        "CodeDeployDefault.LambdaLinear10PercentEvery3Minutes",
+        "CodeDeployDefault.LambdaLinear10PercentEvery10Minutes"
+    ], var.deployment_strategy)
+    error_message = "Allowed values for input_parameter are listed here https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html#deployment-configuration-lambda"
+  }
 }
