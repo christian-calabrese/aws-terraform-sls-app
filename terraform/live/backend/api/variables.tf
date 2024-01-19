@@ -60,3 +60,35 @@ variable "api_gateway_scope" {
   type        = string
   default     = "REGIONAL"
 }
+
+
+variable "api_gateway_metrics_to_alarm" {
+  description = "Dictionary containing information of cloudwatch metrics to be alarmed"
+  type = list(object({
+    metric_name        = string
+    evaluation_periods = number
+    period             = number
+    threshold          = number
+    statistic          = string
+  }))
+
+  default = [{
+    evaluation_periods = 1
+    metric_name        = "5XXError"
+    period             = 60
+    statistic          = "Sum"
+    threshold          = 50
+    },
+    {
+      evaluation_periods = 1
+      metric_name        = "IntegrationLatency"
+      period             = 60
+      statistic          = "p99"
+      threshold          = 500
+  }]
+}
+
+variable "support_email_list" {
+  description = "List of emails of on call support who will receive alarm notifications"
+  type        = list(string)
+}

@@ -140,7 +140,8 @@ module "sls-app-backend-eu-south-1-prod" {
   }
 
   terraform_hcl_variables = {
-    functions = local.functions
+    functions          = local.functions
+    support_email_list = ["christian.calabrese@outlook.com"]
   }
 
   terraform_variables = {
@@ -175,8 +176,11 @@ module "sls-app-backend-cicd-eu-south-1-prod" {
     environment            = "prod"
     be_repository_name     = var.be_repository_name
     be_repository_owner    = var.owner
-    functions              = local.functions
     be_deployment_strategy = "LambdaCanary10Percent10Minutes"
+  }
+
+  terraform_hcl_variables = {
+    functions = local.functions
   }
 
   tag_names = ["region:${var.aws_region}", "environment:prod", "project:${var.project}", "provider:aws", "component:backend-cicd"]
