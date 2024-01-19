@@ -71,21 +71,6 @@ variable "api_gateway_metrics_to_alarm" {
     threshold          = number
     statistic          = string
   }))
-
-  default = [{
-    evaluation_periods = 1
-    metric_name        = "5XXError"
-    period             = 60
-    statistic          = "Sum"
-    threshold          = 50
-    },
-    {
-      evaluation_periods = 1
-      metric_name        = "IntegrationLatency"
-      period             = 60
-      statistic          = "p99"
-      threshold          = 500
-  }]
 }
 
 variable "support_email_list" {

@@ -24,3 +24,8 @@ output "functions_information" {
   description = "Dictionary of functions information (value) and function names (key)"
   value       = aws_lambda_function.functions
 }
+
+output "alarm_names" {
+  description = "List of cloudwatch alarm names"
+  value       = [for alarm in aws_cloudwatch_metric_alarm.api_gateway : alarm.alarm_name]
+}

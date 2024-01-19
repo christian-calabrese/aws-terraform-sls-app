@@ -1,5 +1,3 @@
-# https://registry.terraform.io/modules/terraform-aws-modules/lambda/aws/latest/submodules/deploy?tab=inputs
-
 module "alias_refresh" {
   for_each = data.data.tfe_outputs.backend.values.functions_information
   source   = "terraform-aws-modules/lambda/aws//modules/alias"
@@ -31,16 +29,6 @@ module "deploy" {
   run_deployment             = true
   wait_deployment_completion = true
 
-  triggers = {
-    start = {
-      events     = ["DeploymentStart"]
-      name       = "DeploymentStart"
-      target_arn = "arn:aws:sns:eu-west-1:135367859851:sns1"
-    }
-    success = {
-      events     = ["DeploymentSuccess"]
-      name       = "DeploymentSuccess"
-      target_arn = "arn:aws:sns:eu-west-1:135367859851:sns2"
-    }
-  }
+  alarm_enabled = length(data.tfe_outputs.backend.values.alarm_names) > 0
+  alarms        = data.tfe_outputs.backend.values.alarm_names
 }

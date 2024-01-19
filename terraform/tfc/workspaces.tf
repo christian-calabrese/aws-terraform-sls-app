@@ -142,6 +142,20 @@ module "sls-app-backend-eu-south-1-prod" {
   terraform_hcl_variables = {
     functions          = local.functions
     support_email_list = ["christian.calabrese@outlook.com"]
+    api_gateway_metrics_to_alarm = [{
+      evaluation_periods = 1
+      metric_name        = "5XXError"
+      period             = 60
+      statistic          = "Sum"
+      threshold          = 50
+      },
+      {
+        evaluation_periods = 1
+        metric_name        = "IntegrationLatency"
+        period             = 60
+        statistic          = "p99"
+        threshold          = 500
+    }]
   }
 
   terraform_variables = {
