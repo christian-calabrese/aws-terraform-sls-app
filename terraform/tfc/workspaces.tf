@@ -12,7 +12,7 @@ module "sls-app-network-eu-south-1-prod" {
   execution_mode            = "remote"
   queue_all_runs            = false
   working_directory         = "terraform/live/network"
-  vcs_repository_identifier = "${var.owner}/aws-terraform-sls-app"
+  vcs_repository_identifier = "${var.owner}/${var.repository_name}"
   vcs_repository_branch     = "main"
   oauth_token_id            = var.oauth_client_id
 
@@ -63,8 +63,8 @@ module "sls-app-frontend-eu-south-1-prod" {
   terraform_version         = "1.3.9"
   execution_mode            = "remote"
   queue_all_runs            = false
-  working_directory         = "terraform/live/frontend"
-  vcs_repository_identifier = "${var.owner}/aws-terraform-sls-app"
+  working_directory         = "terraform/live/frontend/webapp"
+  vcs_repository_identifier = "${var.owner}/${var.repository_name}"
   vcs_repository_branch     = "main"
   oauth_token_id            = var.oauth_client_id
 
@@ -94,8 +94,8 @@ module "sls-app-backend-eu-south-1-prod" {
   terraform_version         = "1.3.9"
   execution_mode            = "remote"
   queue_all_runs            = false
-  working_directory         = "terraform/live/backend"
-  vcs_repository_identifier = "${var.owner}/aws-terraform-sls-app"
+  working_directory         = "terraform/live/backend/api"
+  vcs_repository_identifier = "${var.owner}/${var.repository_name}"
   vcs_repository_branch     = "main"
   oauth_token_id            = var.oauth_client_id
 
@@ -131,7 +131,7 @@ module "sls-app-waf-eu-south-1-prod" {
   execution_mode            = "remote"
   queue_all_runs            = false
   working_directory         = "terraform/live/waf"
-  vcs_repository_identifier = "${var.owner}/aws-terraform-sls-app"
+  vcs_repository_identifier = "${var.owner}/${var.repository_name}"
   vcs_repository_branch     = "main"
   oauth_token_id            = var.oauth_client_id
 

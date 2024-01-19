@@ -35,6 +35,12 @@ variable "tfe_token" {
   sensitive   = true
 }
 
+variable "repository_name" {
+  description = "Name of the git repository"
+  type        = string
+  default     = "aws-terraform-sls-app"
+}
+
 
 ################################################################################
 # Variable Set
