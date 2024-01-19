@@ -157,7 +157,7 @@ module "sls-app-backend-eu-south-1-prod" {
         evaluation_periods = 1
         metric_name        = "IntegrationLatency"
         period             = 60
-        statistic          = "p99"
+        statistic          = "Average"
         threshold          = 500
     }]
   }
