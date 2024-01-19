@@ -176,7 +176,7 @@ resource "aws_api_gateway_integration" "functions" {
   uri                     = aws_lambda_function.functions[each.key].invoke_arn
 
   depends_on = [
-    aws_lambda_permission.functions[each.key]
+    aws_lambda_permission.functions
   ]
 }
 
@@ -196,7 +196,7 @@ resource "aws_api_gateway_deployment" "notes_api" {
     redeployment = sha1(jsonencode(aws_api_gateway_rest_api.notes_api.body))
   }
 
-  depends_on = [aws_lambda_permission.create_note, aws_lambda_permission.get_notes, aws_lambda_permission.get_note, aws_lambda_permission.delete_note, aws_api_gateway_method.create_note, aws_api_gateway_method.get_notes, aws_api_gateway_method.get_note, aws_api_gateway_method.delete_note]
+  depends_on = [aws_lambda_permission.functions]
 
   lifecycle {
     create_before_destroy = true
@@ -244,21 +244,21 @@ resource "aws_api_gateway_base_path_mapping" "notes_api" {
 
   api_id      = aws_api_gateway_rest_api.notes_api.id
   stage_name  = aws_api_gateway_stage.notes_api.stage_name
-  domain_name = aws_api_gateway_domain_name.notes_api.id
+  domain_name = aws_api_gateway_domain_name.notes_api[0].id
 
 }
 
 resource "aws_route53_record" "notes_api" {
   count = var.domain_name == null ? 0 : 1
 
-  name    = aws_api_gateway_domain_name.notes_api.domain_name
+  name    = aws_api_gateway_domain_name.notes_api[0].domain_name
   type    = "A"
   zone_id = data.tfe_outputs.network.values.public_zone_id
 
   alias {
     evaluate_target_health = true
-    name                   = var.api_gateway_scope == "REGIONAL" ? aws_api_gateway_domain_name.notes_api.regional_domain_name : aws_api_gateway_domain_name.notes_api.cloudfront_domain_name
-    zone_id                = var.api_gateway_scope == "REGIONAL" ? aws_api_gateway_domain_name.notes_api.regional_zone_id : aws_api_gateway_domain_name.notes_api.cloudfront_zone_id
+    name                   = var.api_gateway_scope == "REGIONAL" ? aws_api_gateway_domain_name.notes_api[0].regional_domain_name : aws_api_gateway_domain_name.notes_api[0].cloudfront_domain_name
+    zone_id                = var.api_gateway_scope == "REGIONAL" ? aws_api_gateway_domain_name.notes_api[0].regional_zone_id : aws_api_gateway_domain_name.notes_api[0].cloudfront_zone_id
   }
 }
 

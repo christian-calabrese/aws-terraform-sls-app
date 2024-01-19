@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_metric_alarm" "api_gateway" {
   for_each            = { for alarm in var.api_gateway_metrics_to_alarm : alarm.metric_name => alarm }
-  alarm_name          = "${var.project}-${var.environment}-api_gateway_${each.value}"
+  alarm_name          = "${var.project}-${var.environment}-api_gateway_${each.key}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = each.value.evaluation_periods
   metric_name         = each.value.metric_name
