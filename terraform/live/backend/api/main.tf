@@ -82,6 +82,8 @@ resource "aws_lambda_function" "functions" {
   role             = aws_iam_role.lambda_notes.arn
   handler          = each.value.handler
   runtime          = each.value.runtime
+  timeout          = each.value.timeout
+  publish          = true
 
   environment {
     variables = merge({

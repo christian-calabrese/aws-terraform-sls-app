@@ -55,5 +55,27 @@ variable "functions" {
     environment = map(string)
     http_method = string
     path_part   = string
+    timeout     = number
   }))
+}
+
+variable "be_deployment_strategy" {
+  type    = string
+  default = "CodeDeployDefault.LambdaAllAtOnce"
+
+  validation {
+    condition = contains(
+      [
+        "CodeDeployDefault.LambdaAllAtOnce",
+        "CodeDeployDefault.LambdaCanary10Percent5Minutes",
+        "CodeDeployDefault.LambdaCanary10Percent10Minutes",
+        "CodeDeployDefault.LambdaCanary10Percent15Minutes",
+        "CodeDeployDefault.LambdaCanary10Percent30Minutes",
+        "CodeDeployDefault.LambdaLinear10PercentEvery1Minute",
+        "CodeDeployDefault.LambdaLinear10PercentEvery2Minutes",
+        "CodeDeployDefault.LambdaLinear10PercentEvery3Minutes",
+        "CodeDeployDefault.LambdaLinear10PercentEvery10Minutes"
+    ], var.deployment_strategy)
+    error_message = "Allowed values for input_parameter are listed here https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html#deployment-configuration-lambda"
+  }
 }

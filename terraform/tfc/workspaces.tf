@@ -103,7 +103,7 @@ module "sls-app-frontend-cicd-eu-south-1-prod" {
 
   terraform_variables = {
     environment         = "prod"
-    fe_repository_name  = "aws-terraform-sls-app-frontend"
+    fe_repository_name  = var.fe_repository_name
     fe_repository_owner = var.owner
   }
 
@@ -151,9 +151,38 @@ module "sls-app-backend-eu-south-1-prod" {
 
 }
 
-################################################################################
-# WAF Workspaces
-################################################################################
+module "sls-app-backend-cicd-eu-south-1-prod" {
+  source  = "flowingis/workspace/tfe"
+  version = "0.5.0"
+
+  name                      = "${var.project}-backend-cicd-${var.aws_region}-prod"
+  organization              = var.organization
+  description               = "Common backend cicd resources for the production environment"
+  terraform_version         = "1.3.9"
+  execution_mode            = "remote"
+  queue_all_runs            = false
+  working_directory         = "terraform/live/backend/cicd"
+  vcs_repository_identifier = "${var.owner}/${var.repository_name}"
+  vcs_repository_branch     = "main"
+  oauth_token_id            = var.oauth_client_id
+
+  environment_sensitive_variables = {
+    AWS_ACCESS_KEY_ID     = var.aws_access_key_id
+    AWS_SECRET_ACCESS_KEY = var.aws_access_key_secret
+  }
+
+  terraform_variables = {
+    environment            = "prod"
+    be_repository_name     = var.be_repository_name
+    be_repository_owner    = var.owner
+    functions              = local.functions
+    be_deployment_strategy = "LambdaCanary10Percent10Minutes"
+  }
+
+  tag_names = ["region:${var.aws_region}", "environment:prod", "project:${var.project}", "provider:aws", "component:backend-cicd"]
+
+}
+
 module "sls-app-waf-eu-south-1-prod" {
   source  = "flowingis/workspace/tfe"
   version = "0.5.0"

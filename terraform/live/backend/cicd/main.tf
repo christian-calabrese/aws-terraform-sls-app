@@ -38,8 +38,8 @@ resource "aws_codepipeline" "codepipeline" {
       version         = 1
 
       configuration = {
-        BucketName = data.tfe_outputs.frontend.values.fe_s3_bucket_name
-        Extract    = true
+        ApplicationName     = module.deploy.codedeploy_app_name
+        DeploymentGroupName = module.deploy.codedeploy_deployment_group_name
       }
     }
   }

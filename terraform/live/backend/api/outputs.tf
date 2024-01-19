@@ -19,3 +19,8 @@ output "functions_arn" {
   description = "Dictionary of arns (value) and function names (key)"
   value       = { for k, v in aws_lambda_function.functions : k => v.arn }
 }
+
+output "functions_information" {
+  description = "Dictionary of functions information (value) and function names (key)"
+  value       = aws_lambda_function.functions
+}

@@ -45,6 +45,7 @@ variable "functions" {
     environment = map(string)
     http_method = string
     path_part   = string
+    timeout     = number
   }))
 }
 
