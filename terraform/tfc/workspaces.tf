@@ -139,6 +139,10 @@ module "sls-app-backend-eu-south-1-prod" {
     AWS_SECRET_ACCESS_KEY = var.aws_access_key_secret
   }
 
+  terraform_hcl_variables = {
+    functions = local.functions
+  }
+
   terraform_variables = {
     environment = "prod"
   }

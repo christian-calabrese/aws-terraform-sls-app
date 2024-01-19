@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "this" {
-  bucket = "${var.project}-${var.environment}-fe-cicd-artifacts"
+  bucket = "${var.project}-${var.environment}-be-cicd-artifacts"
 
   force_destroy = true
 
