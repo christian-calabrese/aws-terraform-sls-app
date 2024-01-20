@@ -61,6 +61,7 @@ resource "aws_wafv2_web_acl" "this" {
 }
 
 resource "aws_wafv2_web_acl_association" "this" {
+  provider     = aws.us-east-1
   resource_arn = data.tfe_outputs.backend.values.api_stage_arn
   web_acl_arn  = aws_wafv2_web_acl.this.arn
 }
