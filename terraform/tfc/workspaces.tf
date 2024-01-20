@@ -135,7 +135,8 @@ module "sls-app-backend-eu-south-1-prod" {
 
   remote_state_consumer_ids = [
     module.sls-app-frontend-eu-south-1-prod.id,
-    module.sls-app-waf-eu-south-1-prod.id
+    module.sls-app-waf-eu-south-1-prod.id,
+    module.sls-app-backend-cicd-eu-south-1-prod.id
   ]
 
   environment_sensitive_variables = {
