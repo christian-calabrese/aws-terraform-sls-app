@@ -13,6 +13,7 @@ module "alias_refresh" {
 module "deploy" {
   for_each = nonsensitive(data.tfe_outputs.backend.values.functions_information)
   source   = "terraform-aws-modules/lambda/aws//modules/deploy"
+  version  = "6.8.0"
 
   alias_name    = module.alias_refresh[each.key].lambda_alias_name
   function_name = each.value.function_name
