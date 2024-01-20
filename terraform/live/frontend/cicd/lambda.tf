@@ -39,7 +39,7 @@ resource "aws_iam_policy" "lambda_cloudfront_policy" {
           "s3:PutObject"
         ]
         Effect   = "Allow"
-        Resource = data.tfe_outputs.frontend.values.fe_s3_bucket_arn
+        Resource = "${data.tfe_outputs.frontend.values.fe_s3_bucket_arn}/*"
       }
     ]
   })
