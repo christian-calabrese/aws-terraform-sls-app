@@ -9,7 +9,7 @@ locals {
       runtime     = "python3.11"
       environment = {}
       http_method = "POST"
-      path_part   = "notes"
+      path_part   = "/notes"
       timeout     = 15
     },
     {
@@ -18,7 +18,7 @@ locals {
       runtime     = "python3.11"
       environment = {}
       http_method = "GET"
-      path_part   = "notes"
+      path_part   = "/notes"
       timeout     = 15
     },
     {
@@ -27,7 +27,7 @@ locals {
       runtime     = "python3.11"
       environment = {}
       http_method = "GET"
-      path_part   = "notes/{note_id}"
+      path_part   = "/notes/{note_id}"
       timeout     = 15
     },
     {
@@ -36,7 +36,7 @@ locals {
       runtime     = "python3.11"
       environment = {}
       http_method = "DELETE"
-      path_part   = "notes/{note_id}"
+      path_part   = "/notes/{note_id}"
       timeout     = 15
     }
   ]
