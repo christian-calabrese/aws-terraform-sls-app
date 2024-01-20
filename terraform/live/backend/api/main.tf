@@ -99,181 +99,52 @@ resource "aws_lambda_function" "functions" {
 ################################################################################
 # API Gateway
 ################################################################################
-resource "aws_api_gateway_account" "main" {
-  cloudwatch_role_arn = aws_iam_role.main.arn
-}
+# API Gateway V2
+module "apigateway" {
+  source  = "terraform-aws-modules/apigateway-v2/aws"
+  version = "2.0.0"
 
-resource "aws_iam_role" "main" {
-  name = "api-gateway-logs-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "apigateway.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-
-}
-
-resource "aws_iam_role_policy_attachment" "main" {
-  role       = aws_iam_role.main.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
-}
-
-resource "aws_api_gateway_method_settings" "notes_api" {
-  rest_api_id = aws_api_gateway_rest_api.notes_api.id
-  stage_name  = aws_api_gateway_stage.notes_api.stage_name
-  method_path = "*/*"
-  settings {
-    logging_level = "ERROR"
-  }
-
-  depends_on = [aws_api_gateway_account.main]
-}
-
-resource "aws_api_gateway_rest_api" "notes_api" {
   name        = "${var.project}-${var.environment}-notes-api"
   description = "API for CRUD operations on notes"
-}
 
-resource "aws_api_gateway_resource" "root" {
-  for_each    = { for v in toset([for i, n in var.functions : n.path_part if !strcontains(n.path_part, "/")]) : v => v }
-  rest_api_id = aws_api_gateway_rest_api.notes_api.id
-  parent_id   = aws_api_gateway_rest_api.notes_api.root_resource_id
-  path_part   = each.value
-}
+  default_stage_access_log_destination_arn = aws_cloudwatch_log_group.apigateway_logs.arn
+  default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
 
-# Dynamically create child resources for the notes resource
-resource "aws_api_gateway_resource" "child" {
-  for_each    = { for v in toset([for i, n in var.functions : n.path_part if strcontains(n.path_part, "/")]) : v => v }
-  rest_api_id = aws_api_gateway_rest_api.notes_api.id
-  parent_id   = aws_api_gateway_resource.root[split("/", each.value)[0]].id
-  path_part   = each.value
-}
-
-# Add method settings to specify the logging level of each HTTP method
-resource "aws_api_gateway_method_settings" "settings" {
-  for_each    = { for v in toset([for i, n in var.functions : n.path_part]) : v => v }
-  rest_api_id = aws_api_gateway_rest_api.notes_api.id
-  stage_name  = aws_api_gateway_stage.notes_api.stage_name
-  method_path = "${each.value}/*"
-  settings {
-    logging_level = "ERROR"
+  cors_configuration = {
+    allow_headers = ["content-type", "x-amz-date", "authorization", "x-api-key", "x-amz-security-token", "x-amz-user-agent"]
+    allow_methods = ["*"]
+    allow_origins = ["*"]
   }
-}
+  protocol_type = "HTTP"
 
-resource "aws_api_gateway_method" "root" {
-  for_each       = { for i, f in var.functions : f.name => f }
-  rest_api_id    = aws_api_gateway_rest_api.notes_api.id
-  resource_id    = !strcontains(each.value.path_part, "/") ? aws_api_gateway_resource.root[each.value.path_part].id : aws_api_gateway_resource.child[each.value.path_part].id
-  http_method    = each.value.http_method
-  authorization  = "NONE"
-  operation_name = "${each.value.name}-operation"
-}
-
-resource "aws_api_gateway_integration" "functions" {
-  for_each                = { for i, f in var.functions : f.name => f }
-  rest_api_id             = aws_api_gateway_rest_api.notes_api.id
-  resource_id             = !strcontains(each.value.path_part, "/") ? aws_api_gateway_resource.root[each.value.path_part].id : aws_api_gateway_resource.child[each.value.path_part].id
-  http_method             = each.value.http_method
-  type                    = "AWS_PROXY"
-  integration_http_method = "POST"
-  uri                     = aws_lambda_function.functions[each.key].invoke_arn
-
-  depends_on = [
-    aws_lambda_permission.functions
-  ]
-}
-
-resource "aws_lambda_permission" "functions" {
-  for_each      = { for i, f in var.functions : f.name => f }
-  statement_id  = "AllowExecutionFromAPIGateway-${each.key}"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.functions[each.key].function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = !strcontains(each.value.path_part, "/") ? "${aws_api_gateway_rest_api.notes_api.execution_arn}/*/${each.value.http_method}${aws_api_gateway_resource.root[each.value.path_part].path_part}" : "${aws_api_gateway_rest_api.notes_api.execution_arn}/*/${each.value.http_method}${aws_api_gateway_resource.child[each.value.path_part].path_part}"
-}
-
-resource "aws_api_gateway_deployment" "notes_api" {
-  rest_api_id = aws_api_gateway_rest_api.notes_api.id
-
-  triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.notes_api.body))
+  integrations = {
+    for function in var.functions : "${function.http_method} ${function.path_part}" => {
+      lambda_arn             = aws_lambda_function.functions[function.name].arn
+      integration_type       = "AWS_PROXY"
+      payload_format_version = "2.0"
+    }
   }
 
-  depends_on = [aws_lambda_permission.functions]
-
-  lifecycle {
-    create_before_destroy = true
-  }
+  create_api_domain_name      = var.domain_name != null
+  domain_name                 = var.domain_name != null ? "${var.subdomain_name}.${var.domain_name}" : null
+  domain_name_certificate_arn = var.domain_name != null ? data.tfe_outputs.network.values.acm_certificate_arn : null
 }
 
-resource "aws_api_gateway_stage" "notes_api" {
-  deployment_id = aws_api_gateway_deployment.notes_api.id
-  rest_api_id   = aws_api_gateway_rest_api.notes_api.id
-  stage_name    = var.environment
-
-  depends_on = [aws_cloudwatch_log_group.api_gateway]
-}
-
-resource "aws_cloudwatch_log_group" "api_gateway" {
-  name              = "API-Gateway-Execution-Logs_${aws_api_gateway_rest_api.notes_api.id}/${var.environment}"
-  retention_in_days = 7
-}
-
-module "cors" {
-  for_each = { for v in toset([for i, n in var.functions : n.path_part if !strcontains(n.path_part, "/")]) : v => v }
-  source   = "squidfunk/api-gateway-enable-cors/aws"
-  version  = "0.3.3"
-
-  api_id          = aws_api_gateway_rest_api.notes_api.id
-  api_resource_id = aws_api_gateway_resource.root[each.key].id
-}
-
-################################################################################
-# API Gateway Custom Domain
-################################################################################
-
-resource "aws_api_gateway_domain_name" "notes_api" {
-  count = var.domain_name == null ? 0 : 1
-
-  domain_name     = var.domain_name
-  certificate_arn = data.tfe_outputs.network.values.acm_certificate_arn
-
-  endpoint_configuration {
-    types = [var.api_gateway_scope]
-  }
-}
-
-resource "aws_api_gateway_base_path_mapping" "notes_api" {
-  count = var.domain_name == null ? 0 : 1
-
-  api_id      = aws_api_gateway_rest_api.notes_api.id
-  stage_name  = aws_api_gateway_stage.notes_api.stage_name
-  domain_name = aws_api_gateway_domain_name.notes_api[0].id
-
+resource "aws_cloudwatch_log_group" "apigateway_logs" {
+  name = "${var.project}-${var.environment}-notes-api-logs"
 }
 
 resource "aws_route53_record" "notes_api" {
   count = var.domain_name == null ? 0 : 1
 
-  name    = aws_api_gateway_domain_name.notes_api[0].domain_name
+  name    = var.subdomain_name
   type    = "A"
   zone_id = data.tfe_outputs.network.values.public_zone_id
 
   alias {
-    evaluate_target_health = true
-    name                   = var.api_gateway_scope == "REGIONAL" ? aws_api_gateway_domain_name.notes_api[0].regional_domain_name : aws_api_gateway_domain_name.notes_api[0].cloudfront_domain_name
-    zone_id                = var.api_gateway_scope == "REGIONAL" ? aws_api_gateway_domain_name.notes_api[0].regional_zone_id : aws_api_gateway_domain_name.notes_api[0].cloudfront_zone_id
+    name                   = module.apigateway.apigatewayv2_domain_name_configuration[0].target_domain_name
+    zone_id                = module.apigateway.apigatewayv2_domain_name_configuration[0].hosted_zone_id
+    evaluate_target_health = false
   }
 }
 

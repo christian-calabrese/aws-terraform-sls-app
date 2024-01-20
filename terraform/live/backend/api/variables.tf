@@ -55,6 +55,12 @@ variable "domain_name" {
   default     = null
 }
 
+variable "subdomain_name" {
+  description = "value"
+  type        = string
+  default     = "api"
+}
+
 variable "api_gateway_scope" {
   description = "The scope of the api gateway. It can be REGIONAL or EDGE"
   type        = string

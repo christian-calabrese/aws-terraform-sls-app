@@ -11,7 +11,7 @@ resource "aws_cloudwatch_metric_alarm" "api_gateway" {
   alarm_description   = "Alarm for API Gateway ${each.key}"
 
   dimensions = {
-    ApiName = aws_api_gateway_rest_api.notes_api.name
+    ApiName = module.apigateway.apigatewayv2_api_id
   }
 
   alarm_actions = [
