@@ -194,7 +194,7 @@ module "sls-app-backend-cicd-eu-south-1-prod" {
     environment            = "prod"
     be_repository_name     = var.be_repository_name
     be_repository_owner    = var.owner
-    be_deployment_strategy = "LambdaCanary10Percent10Minutes"
+    be_deployment_strategy = "CodeDeployDefault.LambdaCanary10Percent10Minutes"
   }
 
   terraform_hcl_variables = {
