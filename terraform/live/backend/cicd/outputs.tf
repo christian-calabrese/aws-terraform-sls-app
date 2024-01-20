@@ -2,5 +2,5 @@
 # Backend CI/CD
 ################################################################################
 output "appspec" {
-  value = [for codedeploy in module.deploy.appspec : codedeploy.appspec]
+  value = [for codedeploy in module.deploy : codedeploy.appspec]
 }
