@@ -32,6 +32,14 @@ resource "aws_iam_policy" "lambda_cloudfront_policy" {
         ]
         Effect   = "Allow"
         Resource = data.tfe_outputs.frontend.values.fe_cloudfront_distribution_arn
+      },
+      {
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject"
+        ]
+        Effect   = "Allow"
+        Resource = data.tfe_outputs.frontend.values.fe_s3_bucket_arn
       }
     ]
   })
@@ -55,10 +63,13 @@ resource "aws_lambda_function" "create_invalidation" {
   role             = aws_iam_role.lambda_invalidation.arn
   handler          = "main.lambda_handler"
   runtime          = "python3.11"
+  timeout          = 60
 
   environment {
     variables = {
       CLOUDFRONT_DISTRIBUTION_ID = data.tfe_outputs.frontend.values.fe_cloudfront_distribution_id
+      FE_BUCKET_NAME             = data.tfe_outputs.frontend.values.fe_s3_bucket_name
+      API_ENDPOINT               = data.tfe_outputs.backend.values.api_endpoint
     }
   }
 

@@ -6,3 +6,8 @@ data "tfe_outputs" "frontend" {
   organization = var.organization
   workspace    = "${var.project}-frontend-${var.aws_region}-${var.environment}"
 }
+
+data "tfe_outputs" "backend" {
+  organization = var.organization
+  workspace    = "${var.project}-backend-${var.aws_region}-${var.environment}"
+}
