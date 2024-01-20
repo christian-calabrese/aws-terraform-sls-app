@@ -46,6 +46,17 @@ resource "aws_iam_policy" "codepipeline_policy" {
         "${aws_s3_bucket.this.arn}",
         "${aws_s3_bucket.this.arn}/*"
       ]
+    },
+    {
+      "Action": [
+        "codedeploy:CreateDeployment",
+        "codedeploy:GetApplicationRevision",
+        "codedeploy:GetDeployment",
+        "codedeploy:GetDeploymentConfig",
+        "codedeploy:RegisterApplicationRevision"
+      ],
+      "Resource": "*",
+      "Effect": "Allow"
     }
   ]
 }
