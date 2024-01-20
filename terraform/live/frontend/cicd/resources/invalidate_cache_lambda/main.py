@@ -19,12 +19,18 @@ def lambda_handler(event, context):
     # Read the HTML content from S3
     response = s3.get_object(Bucket=bucket_name, Key=object_key)
     html_content = response['Body'].read().decode('utf-8')
+    content_type = response.get('ContentType', 'text/html')
 
     # Replace the placeholder with the environment variable value
     updated_html_content = html_content.replace('{{API_ENDPOINT}}', api_endpoint)
 
     # Write back the updated HTML content to S3
-    s3.put_object(Bucket=bucket_name, Key=object_key, Body=updated_html_content.encode('utf-8'))
+    s3.put_object(
+        Bucket=bucket_name,
+        Key=object_key,
+        Body=updated_html_content.encode('utf-8'),
+        ContentType=content_type  # preserve the Content-Type
+    )
 
     caller_reference = event['CodePipeline.job']['id']
 
