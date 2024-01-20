@@ -96,6 +96,15 @@ resource "aws_lambda_function" "functions" {
   ]
 }
 
+resource "aws_lambda_permission" "functions" {
+  for_each      = { for i, f in var.functions : f.name => f }
+  statement_id  = "AllowExecutionFromAPIGateway-${each.key}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.functions[each.key].function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${module.apigateway.apigatewayv2_api_execution_arn}/*/*"
+}
+
 ################################################################################
 # API Gateway
 ################################################################################
