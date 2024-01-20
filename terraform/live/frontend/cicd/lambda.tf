@@ -40,6 +40,14 @@ resource "aws_iam_policy" "lambda_cloudfront_policy" {
         ]
         Effect   = "Allow"
         Resource = "${data.tfe_outputs.frontend.values.fe_s3_bucket_arn}/*"
+      },
+      {
+        Action = [
+          "codepipeline:PutJobSuccessResult",
+          "codepipeline:PutJobFailureResult"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
       }
     ]
   })
