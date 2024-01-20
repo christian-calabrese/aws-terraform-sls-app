@@ -67,3 +67,37 @@ resource "aws_iam_role_policy_attachment" "codepipeline_role_attachment" {
   policy_arn = aws_iam_policy.codepipeline_policy.arn
   role       = aws_iam_role.codepipeline_role.id
 }
+
+resource "aws_iam_policy" "codedeploy_policy" {
+
+  name = "${var.project}-${var.environment}-codedeploy-pipeline-policy"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect":"Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:GetBucketVersioning",
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "${aws_s3_bucket.this.arn}",
+        "${aws_s3_bucket.this.arn}/*"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "codedeploy_role_attachment" {
+  for_each   = nonsensitive(data.tfe_outputs.backend.values.functions_information)
+  policy_arn = aws_iam_policy.codedeploy_policy.arn
+  role       = module.deploy[each.key].codedeploy_iam_role_name
+
+  depends_on = [module.deploy]
+}

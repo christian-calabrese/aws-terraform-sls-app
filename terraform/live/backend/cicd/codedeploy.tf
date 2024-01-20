@@ -24,6 +24,7 @@ module "deploy" {
 
   create_deployment_group = true
   deployment_group_name   = each.key
+  deployment_config_name  = var.be_deployment_strategy
 
   create_deployment          = true
   run_deployment             = true
