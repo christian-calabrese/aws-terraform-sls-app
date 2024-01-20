@@ -102,7 +102,7 @@ resource "aws_lambda_function" "functions" {
 # API Gateway V2
 module "apigateway" {
   source  = "terraform-aws-modules/apigateway-v2/aws"
-  version = "2.0.0"
+  version = "2.2.2"
 
   name        = "${var.project}-${var.environment}-notes-api"
   description = "API for CRUD operations on notes"
