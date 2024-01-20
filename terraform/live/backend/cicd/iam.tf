@@ -46,15 +46,6 @@ resource "aws_iam_policy" "codepipeline_policy" {
         "${aws_s3_bucket.this.arn}",
         "${aws_s3_bucket.this.arn}/*"
       ]
-    },
-    {
-      "Effect":"Allow",
-      "Action": [
-        "lambda:InvokeFunction"
-      ],
-      "Resource": [
-        "${aws_lambda_function.create_invalidation.arn}",
-      ]
     }
   ]
 }

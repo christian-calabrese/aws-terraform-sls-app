@@ -29,17 +29,21 @@ resource "aws_codepipeline" "codepipeline" {
   stage {
     name = "Deploy"
 
-    action {
-      name            = "Deploy"
-      category        = "Deploy"
-      owner           = "AWS"
-      provider        = "CodeDeploy"
-      input_artifacts = ["source_output"]
-      version         = 1
+    dynamic "action" {
+      for_each = nonsensitive(data.tfe_outputs.backend.values.functions_information)
 
-      configuration = {
-        ApplicationName     = module.deploy.codedeploy_app_name
-        DeploymentGroupName = module.deploy.codedeploy_deployment_group_name
+      content {
+        name            = "Deploy_${action.key}"
+        category        = "Deploy"
+        owner           = "AWS"
+        provider        = "CodeDeploy"
+        input_artifacts = ["source_output"]
+        version         = 1
+
+        configuration = {
+          ApplicationName     = module.deploy[action.key].codedeploy_app_name
+          DeploymentGroupName = module.deploy[action.key].codedeploy_deployment_group_name
+        }
       }
     }
   }

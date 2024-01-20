@@ -75,7 +75,7 @@ variable "be_deployment_strategy" {
         "CodeDeployDefault.LambdaLinear10PercentEvery2Minutes",
         "CodeDeployDefault.LambdaLinear10PercentEvery3Minutes",
         "CodeDeployDefault.LambdaLinear10PercentEvery10Minutes"
-    ], var.deployment_strategy)
+    ], var.be_deployment_strategy)
     error_message = "Allowed values for input_parameter are listed here https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html#deployment-configuration-lambda"
   }
 }
