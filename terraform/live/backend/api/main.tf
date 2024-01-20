@@ -145,22 +145,36 @@ resource "aws_api_gateway_rest_api" "notes_api" {
   description = "API for CRUD operations on notes"
 }
 
-resource "aws_api_gateway_resource" "notes_resource" {
+resource "aws_api_gateway_resource" "root" {
+  for_each    = { for v in toset([for i, n in var.functions : n.path_part if !strcontains(n.path_part, "/")]) : v => v }
   rest_api_id = aws_api_gateway_rest_api.notes_api.id
   parent_id   = aws_api_gateway_rest_api.notes_api.root_resource_id
-  path_part   = "notes"
+  path_part   = each.value
 }
 
-resource "aws_api_gateway_resource" "note_resource" {
+# Dynamically create child resources for the notes resource
+resource "aws_api_gateway_resource" "child" {
+  for_each    = { for v in toset([for i, n in var.functions : n.path_part if strcontains(n.path_part, "/")]) : v => v }
   rest_api_id = aws_api_gateway_rest_api.notes_api.id
-  parent_id   = aws_api_gateway_resource.notes_resource.id
-  path_part   = "{note_id}"
+  parent_id   = aws_api_gateway_resource.root[split("/", each.value)[0]].id
+  path_part   = each.value
 }
 
-resource "aws_api_gateway_method" "functions" {
+# Add method settings to specify the logging level of each HTTP method
+resource "aws_api_gateway_method_settings" "settings" {
+  for_each    = { for v in toset([for i, n in var.functions : n.path_part]) : v => v }
+  rest_api_id = aws_api_gateway_rest_api.notes_api.id
+  stage_name  = aws_api_gateway_stage.notes_api.stage_name
+  method_path = "${each.value}/*"
+  settings {
+    logging_level = "ERROR"
+  }
+}
+
+resource "aws_api_gateway_method" "root" {
   for_each       = { for i, f in var.functions : f.name => f }
   rest_api_id    = aws_api_gateway_rest_api.notes_api.id
-  resource_id    = aws_api_gateway_resource.notes_resource.id
+  resource_id    = !strcontains(each.value.path_part, "/") ? aws_api_gateway_resource.root[each.value.path_part].id : aws_api_gateway_resource.child[each.value.path_part].id
   http_method    = each.value.http_method
   authorization  = "NONE"
   operation_name = "${each.value.name}-operation"
@@ -169,7 +183,7 @@ resource "aws_api_gateway_method" "functions" {
 resource "aws_api_gateway_integration" "functions" {
   for_each                = { for i, f in var.functions : f.name => f }
   rest_api_id             = aws_api_gateway_rest_api.notes_api.id
-  resource_id             = aws_api_gateway_resource.notes_resource.id
+  resource_id             = !strcontains(each.value.path_part, "/") ? aws_api_gateway_resource.root[each.value.path_part].id : aws_api_gateway_resource.child[each.value.path_part].id
   http_method             = each.value.http_method
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
@@ -186,7 +200,7 @@ resource "aws_lambda_permission" "functions" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.functions[each.key].function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.notes_api.execution_arn}/*/${each.value.http_method}${each.value.path_part}"
+  source_arn    = !strcontains(each.value.path_part, "/") ? "${aws_api_gateway_rest_api.notes_api.execution_arn}/*/${each.value.http_method}${aws_api_gateway_resource.root[each.value.path_part].path_part}" : "${aws_api_gateway_rest_api.notes_api.execution_arn}/*/${each.value.http_method}${aws_api_gateway_resource.child[each.value.path_part].path_part}"
 }
 
 resource "aws_api_gateway_deployment" "notes_api" {
@@ -217,11 +231,12 @@ resource "aws_cloudwatch_log_group" "api_gateway" {
 }
 
 module "cors" {
-  source  = "squidfunk/api-gateway-enable-cors/aws"
-  version = "0.3.3"
+  for_each = { for v in toset([for i, n in var.functions : n.path_part if !strcontains(n.path_part, "/")]) : v => v }
+  source   = "squidfunk/api-gateway-enable-cors/aws"
+  version  = "0.3.3"
 
   api_id          = aws_api_gateway_rest_api.notes_api.id
-  api_resource_id = aws_api_gateway_resource.note_resource.id
+  api_resource_id = aws_api_gateway_resource.root[each.key].id
 }
 
 ################################################################################
@@ -268,6 +283,6 @@ resource "aws_route53_record" "notes_api" {
 #The aws_codestarconnections_connection resource is created in the state PENDING.
 #Authentication with the connection provider must be completed in the AWS Console.
 resource "aws_codestarconnections_connection" "github" {
-  name          = "${var.project}-${var.environment}-github-codestar-connection-frontend"
+  name          = "${var.project}-${var.environment}-github-be"
   provider_type = "GitHub"
 }
