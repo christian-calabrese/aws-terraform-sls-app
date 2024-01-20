@@ -8,7 +8,7 @@ module "sls-app-network-eu-south-1-prod" {
   name                      = "${var.project}-network-${var.aws_region}-prod"
   organization              = var.organization
   description               = "Common network resources for the production environment"
-  terraform_version         = "1.3.9"
+  terraform_version         = "1.7.0"
   execution_mode            = "remote"
   queue_all_runs            = false
   working_directory         = "terraform/live/network"
@@ -60,7 +60,7 @@ module "sls-app-frontend-eu-south-1-prod" {
   name                      = "${var.project}-frontend-${var.aws_region}-prod"
   organization              = var.organization
   description               = "Common frontend resources for the production environment"
-  terraform_version         = "1.3.9"
+  terraform_version         = "1.7.0"
   execution_mode            = "remote"
   queue_all_runs            = false
   working_directory         = "terraform/live/frontend/webapp"
@@ -92,7 +92,7 @@ module "sls-app-frontend-cicd-eu-south-1-prod" {
   name                      = "${var.project}-frontend-cicd-${var.aws_region}-prod"
   organization              = var.organization
   description               = "Common frontend cicd resources for the production environment"
-  terraform_version         = "1.3.9"
+  terraform_version         = "1.7.0"
   execution_mode            = "remote"
   queue_all_runs            = false
   working_directory         = "terraform/live/frontend/cicd"
@@ -125,7 +125,7 @@ module "sls-app-backend-eu-south-1-prod" {
   name                      = "${var.project}-backend-${var.aws_region}-prod"
   organization              = var.organization
   description               = "Common backend resources for the production environment"
-  terraform_version         = "1.3.9"
+  terraform_version         = "1.7.0"
   execution_mode            = "remote"
   queue_all_runs            = false
   working_directory         = "terraform/live/backend/api"
@@ -177,7 +177,7 @@ module "sls-app-backend-cicd-eu-south-1-prod" {
   name                      = "${var.project}-backend-cicd-${var.aws_region}-prod"
   organization              = var.organization
   description               = "Common backend cicd resources for the production environment"
-  terraform_version         = "1.3.9"
+  terraform_version         = "1.7.0"
   execution_mode            = "remote"
   queue_all_runs            = false
   working_directory         = "terraform/live/backend/cicd"
@@ -212,7 +212,7 @@ module "sls-app-waf-eu-south-1-prod" {
   name                      = "${var.project}-waf-${var.aws_region}-prod"
   organization              = var.organization
   description               = "Common waf resources for the production environment"
-  terraform_version         = "1.3.9"
+  terraform_version         = "1.7.0"
   execution_mode            = "remote"
   queue_all_runs            = false
   working_directory         = "terraform/live/waf"
