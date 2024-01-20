@@ -45,6 +45,11 @@ resource "aws_iam_policy" "lambda_cloudfront_policy" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_permissions" {
+  policy_arn = aws_iam_policy.lambda_cloudfront_policy.arn
+  role       = aws_iam_role.lambda_invalidation.name
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
   role       = aws_iam_role.lambda_invalidation.name
