@@ -55,7 +55,7 @@ resource "aws_iam_policy" "codepipeline_policy" {
         "lambda:InvokeFunction"
       ],
       "Resource": [
-        "${aws_lambda_function.create_invalidation.arn}",
+        "${aws_lambda_function.create_invalidation.arn}"
       ]
     }
   ]
