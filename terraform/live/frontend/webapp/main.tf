@@ -136,6 +136,6 @@ resource "aws_cloudfront_distribution" "this" {
 #The aws_codestarconnections_connection resource is created in the state PENDING.
 #Authentication with the connection provider must be completed in the AWS Console.
 resource "aws_codestarconnections_connection" "github" {
-  name          = "${var.project}-${var.environment}-github-codestar-connection-frontend"
+  name          = "${var.project}-${var.environment}-github-fe"
   provider_type = "GitHub"
 }
