@@ -41,12 +41,12 @@ output "public_zone_arn" {
 
 output "private_zone_id" {
   description = "The private hosted zone id"
-  value       = aws_route53_zone.private_zone.id
+  value       = var.create_private_hosted_zone ? aws_route53_zone.private_zone[0].id : null
 }
 
 output "private_zone_arn" {
   description = "The private hosted zone arn"
-  value       = aws_route53_zone.private_zone.arn
+  value       = var.create_private_hosted_zone ? aws_route53_zone.private_zone[0].arn : null
 }
 
 output "acm_certificate_arn" {
