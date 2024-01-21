@@ -83,3 +83,19 @@ variable "support_email_list" {
   description = "List of emails of on call support who will receive alarm notifications"
   type        = list(string)
 }
+
+################################################################################
+# WAF variables
+################################################################################
+variable "waf_rate_based_statement_limit" {
+  description = "Rate limit for a single client IP calling the Api Gateway"
+  type        = number
+  default     = 100
+}
+
+variable "waf_log_retention_days" {
+  description = "Days of WAF logs retention"
+  type        = number
+  default     = 7
+}
+

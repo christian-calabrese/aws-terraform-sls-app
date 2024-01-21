@@ -207,32 +207,3 @@ module "sls-app-backend-cicd-eu-south-1-prod" {
   tag_names = ["region:${var.aws_region}", "environment:prod", "project:${var.project}", "provider:aws", "component:backend-cicd"]
 
 }
-
-# TODO: issue14 Integrate cloudfront + waf in front of HTTP api gateway 
-module "sls-app-waf-eu-south-1-prod" {
-  source  = "flowingis/workspace/tfe"
-  version = "0.5.0"
-
-  name                      = "${var.project}-waf-${var.aws_region}-prod"
-  organization              = var.organization
-  description               = "Common waf resources for the production environment"
-  terraform_version         = "1.7.0"
-  execution_mode            = "remote"
-  queue_all_runs            = false
-  working_directory         = "terraform/live/waf"
-  vcs_repository_identifier = "${var.owner}/${var.repository_name}"
-  vcs_repository_branch     = "main"
-  oauth_token_id            = var.oauth_client_id
-
-  environment_sensitive_variables = {
-    AWS_ACCESS_KEY_ID     = var.aws_access_key_id
-    AWS_SECRET_ACCESS_KEY = var.aws_access_key_secret
-  }
-
-  terraform_variables = {
-    environment = "prod"
-  }
-
-  tag_names = ["region:${var.aws_region}", "environment:prod", "project:${var.project}", "provider:aws", "component:waf"]
-
-}

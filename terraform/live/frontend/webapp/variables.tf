@@ -66,3 +66,18 @@ variable "fe_default_ttl" {
 variable "fe_max_ttl" {
   default = 86400
 }
+
+################################################################################
+# WAF variables
+################################################################################
+variable "waf_rate_based_statement_limit" {
+  description = "Rate limit for a single client IP calling the protected resource"
+  type        = number
+  default     = 100
+}
+
+variable "waf_log_retention_days" {
+  description = "Days of WAF logs retention"
+  type        = number
+  default     = 7
+}

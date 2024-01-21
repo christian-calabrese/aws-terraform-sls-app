@@ -67,6 +67,8 @@ resource "aws_cloudfront_distribution" "this" {
   comment             = var.project
   default_root_object = "index.html"
 
+  web_acl_id = aws_wafv2_web_acl.fe.arn
+
   restrictions {
     geo_restriction {
       restriction_type = "none"
