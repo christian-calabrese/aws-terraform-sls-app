@@ -84,6 +84,24 @@ variable "support_email_list" {
   type        = list(string)
 }
 
+variable "dynamodb_billing_mode" {
+  description = "DynamoDB billing mode can be either PROVISIONED or PAY_PER_REQUEST"
+  type        = string
+  default     = "PAY_PER_REQUEST"
+}
+
+variable "dynamodb_read_capacity" {
+  description = "DynamoDB billing mode can be either PROVISIONED or PAY_PER_REQUEST"
+  type        = number
+  default     = null
+}
+
+variable "dynamodb_write_capacity" {
+  description = "DynamoDB billing mode can be either PROVISIONED or PAY_PER_REQUEST"
+  type        = number
+  default     = null
+}
+
 ################################################################################
 # WAF variables
 ################################################################################

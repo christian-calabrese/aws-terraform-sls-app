@@ -2,8 +2,10 @@
 # DynamoDB
 ################################################################################
 resource "aws_dynamodb_table" "notes" {
-  name         = "${var.project}-${var.environment}-notes"
-  billing_mode = "PAY_PER_REQUEST"
+  name           = "${var.project}-${var.environment}-notes"
+  billing_mode   = var.dynamodb_billing_mode
+  read_capacity  = var.dynamodb_billing_mode == "PROVISIONED" ? var.dynamodb_read_capacity : null
+  write_capacity = var.dynamodb_billing_mode == "PROVISIONED" ? var.dynamodb_write_capacity : null
 
   attribute {
     name = "note_id"
