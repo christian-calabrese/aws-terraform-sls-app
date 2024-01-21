@@ -4,6 +4,10 @@ ___
 ## Introduction
 The Terraform code in this repository allows deploying an infrastructure capable of hosting a static frontend and a backend compatible with the serverless paradigm. The choice of this stack is dictated by the scalability and high inherent availability of AWS serverless managed services.
 
+This is a simplified architecture diagram of the architecture implemented in this project:
+
+![Solution Diagram](docs/images/serverless.png "Solution Diagram")
+
 Alternatively, there are more classical three-tier architectures that involve the use of EC2 instances or container orchestrators (on ECS or EKS) to host presentation and logic layers. For the data layer, it is possible to use SQL databases (on RDS) or NoSQL databases (DocumentDB, MongoDB) (*).
 
 ![Three Tier](docs/images/three-tier.png "Three Tier")
