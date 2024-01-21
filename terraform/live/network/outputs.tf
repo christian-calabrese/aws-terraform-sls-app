@@ -31,12 +31,12 @@ output "public_subnets" {
 ################################################################################
 output "public_zone_id" {
   description = "The public hosted zone id"
-  value       = var.domain_name != null ? aws_route53_zone.public_zone.id : null
+  value       = var.domain_name != null ? aws_route53_zone.public_zone[0].id : null
 }
 
 output "public_zone_arn" {
   description = "The public hosted zone arn"
-  value       = var.domain_name != null ? aws_route53_zone.public_zone.arn : null
+  value       = var.domain_name != null ? aws_route53_zone.public_zone[0].arn : null
 }
 
 output "private_zone_id" {
@@ -51,5 +51,5 @@ output "private_zone_arn" {
 
 output "acm_certificate_arn" {
   description = "The arn of the certificate"
-  value       = var.domain_name != null ? module.acm.acm_certificate_arn : null
+  value       = var.domain_name != null ? module.acm[0].acm_certificate_arn : null
 }
