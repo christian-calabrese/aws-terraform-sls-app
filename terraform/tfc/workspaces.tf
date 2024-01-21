@@ -33,7 +33,7 @@ module "sls-app-network-eu-south-1-prod" {
   }
 
   terraform_hcl_variables = {
-    vpc_public_subnets   = ["172.31.1.0/24", "172.31.2.0/24", "172.23.3.0/24"]
+    vpc_public_subnets   = ["172.31.1.0/24", "172.31.2.0/24", "172.31.3.0/24"]
     vpc_private_subnets  = ["172.31.10.0/24", "172.31.11.0/24", "172.31.12.0/24"]
     vpc_database_subnets = ["172.31.20.0/24", "172.31.21.0/24", "172.31.22.0/24"]
   }
