@@ -2,6 +2,7 @@
 # WAF Frontend
 ################################################################################
 resource "aws_wafv2_web_acl" "fe" {
+  provider    = aws.us-east-1
   name        = "${var.project}-${var.environment}-notes-frontend"
   description = "Web ACL for ${var.project}-${var.environment} frontend"
   scope       = "CLOUDFRONT"
@@ -64,22 +65,26 @@ resource "aws_wafv2_web_acl" "fe" {
 # WebAcl LogConfiguration
 ################################################################################
 resource "aws_cloudwatch_log_group" "web_acl_log_group_fe" {
+  provider          = aws.us-east-1
   name              = "aws-waf-logs-${var.project}-fe-${var.environment}"
   retention_in_days = var.waf_log_retention_days
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "web_acl_log_group_to_web_acl_fe" {
+  provider                = aws.us-east-1
   log_destination_configs = [aws_cloudwatch_log_group.web_acl_log_group_fe.arn]
   resource_arn            = aws_wafv2_web_acl.fe.arn
 }
 
 resource "aws_cloudwatch_log_resource_policy" "web_acl_log_group_fe_policy" {
+  provider        = aws.us-east-1
   policy_document = data.aws_iam_policy_document.web_acl_log_group_policy_fe.json
   policy_name     = "${var.project}-${var.environment}-waf-logs-policy"
 }
 
 data "aws_iam_policy_document" "web_acl_log_group_policy_fe" {
-  version = "2012-10-17"
+  provider = aws.us-east-1
+  version  = "2012-10-17"
   statement {
     effect = "Allow"
     principals {
