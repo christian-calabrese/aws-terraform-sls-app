@@ -64,7 +64,7 @@ resource "aws_wafv2_web_acl" "fe" {
 # WebAcl LogConfiguration
 ################################################################################
 resource "aws_cloudwatch_log_group" "web_acl_log_group_fe" {
-  name              = "aws-waf-logs-${var.project}-frontend-${var.environment}"
+  name              = "aws-waf-logs-${var.project}-fe-${var.environment}"
   retention_in_days = var.waf_log_retention_days
 }
 
