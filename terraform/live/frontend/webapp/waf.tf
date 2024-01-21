@@ -4,7 +4,7 @@
 resource "aws_wafv2_web_acl" "fe" {
   name        = "${var.project}-${var.environment}-notes-frontend"
   description = "Web ACL for ${var.project}-${var.environment} frontend"
-  scope       = "REGIONAL"
+  scope       = "CLOUDFRONT"
 
   default_action {
     allow {}

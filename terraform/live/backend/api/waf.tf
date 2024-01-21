@@ -5,7 +5,7 @@
 # resource "aws_wafv2_web_acl" "this" {
 #   name        = "${var.project}-${var.environment}-notes-api"
 #   description = "Web ACL for ${var.project}-${var.environment}"
-#   scope       = "REGIONAL"
+#   scope       = "CLOUDFRONT"
 
 #   default_action {
 #     allow {}
